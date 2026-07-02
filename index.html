@@ -496,6 +496,13 @@
     font-weight:900;
     white-space:nowrap;
   }
+  .path-link.is-pending{
+    color:rgba(86,63,78,.58);
+    border-color:rgba(86,63,78,.16);
+    background:rgba(255,255,255,.55);
+    cursor:not-allowed;
+    pointer-events:none;
+  }
   .method{
     display:grid;
     grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;
@@ -792,10 +799,13 @@
       const title = Array.isArray(item) ? item[0] : item.title;
       const desc = Array.isArray(item) ? item[1] : item.desc;
       const href = Array.isArray(item) ? '#' : (item.href || '#');
+      const isReady = href && href !== '#';
+      const linkText = isReady ? '查看' : '待更新';
+      const linkClass = isReady ? 'path-link' : 'path-link is-pending';
       return `
       <div class="path-item">
         <div><b>${title}</b><span>${desc}</span></div>
-        <a class="path-link" href="${href}">查看</a>
+        <a class="${linkClass}" href="${href}" ${isReady ? '' : 'aria-disabled="true"'}>${linkText}</a>
       </div>
     `;
     }).join('');
