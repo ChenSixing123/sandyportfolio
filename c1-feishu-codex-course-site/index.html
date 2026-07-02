@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Codex + 飞书：把协作工具接入 AI Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fff4f8;--paper2:#fff9fb;--ink:#241526;--ink-soft:#59415b;--muted:#9c7f8a;
+    --line:#ead2dc;--card:#f8e7ef;--card2:#fffafb;--pink:#ec4b91;--pink-deep:#c22d72;
+    --teal:#168f84;--teal-soft:#e5f5f1;--cream:#fff8ec;--blue:#6f72df;
+    --font-cjk:"Noto Sans SC",system-ui,sans-serif;--font-latin:"Sora",var(--font-cjk);--font-mono:"Space Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font-cjk);background:var(--paper);color:var(--ink);overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 18% 12%,rgba(236,75,145,.13),transparent 24%),radial-gradient(circle at 84% 18%,rgba(255,184,211,.2),transparent 26%),linear-gradient(90deg,rgba(194,45,114,.045) 1px,transparent 1px),linear-gradient(0deg,rgba(194,45,114,.04) 1px,transparent 1px);background-size:auto,auto,46px 46px,46px 46px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.78),rgba(0,0,0,.12));z-index:-1}
+  .progress{position:fixed;top:0;left:0;height:4px;background:var(--pink);width:0;z-index:50}
+  .dots{position:fixed;right:22px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:9px;z-index:30}
+  .dots a{width:9px;height:9px;border-radius:50%;background:#c9c4bb;cursor:pointer;transition:.2s}.dots a.on{background:var(--pink);transform:scale(1.35)}
+  section{padding:34px 7vw;border-bottom:1px solid rgba(194,45,114,.1);display:flex;align-items:center}
+  .wrap{width:min(1120px,100%);margin:0 auto}
+  .hero{padding-top:56px;padding-bottom:42px;background:var(--paper)}
+  .top-home{position:fixed;top:18px;right:22px;z-index:60;display:inline-flex;align-items:center;min-height:38px;padding:0 15px;border-radius:999px;background:var(--ink);color:#fff;text-decoration:none;font-weight:900;font-size:14px;box-shadow:0 14px 36px -28px rgba(36,21,38,.65)}
+  .num,.eyebrow{font-family:var(--font-mono);font-size:12px;color:var(--pink-deep);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}.tag{border:1px solid var(--pink);border-radius:4px;padding:3px 8px;margin-right:9px;background:rgba(236,75,145,.1)}
+  h1{font-family:var(--font-latin);font-size:clamp(40px,5.7vw,78px);line-height:.98;letter-spacing:0;margin:14px 0 16px;max-width:1050px}.hot{color:var(--pink)}
+  h2{font-family:var(--font-latin);font-size:clamp(32px,4.2vw,56px);line-height:1.06;letter-spacing:0;margin-bottom:14px;max-width:980px}h3{font-size:21px;line-height:1.22}.sub,.lead{font-size:clamp(17px,1.75vw,21px);line-height:1.5;color:var(--ink-soft);max-width:900px}.lead strong,.sub strong{color:var(--ink)}
+  a.text-link{color:var(--pink-deep);font-style:italic;text-decoration-line:underline;text-decoration-color:var(--pink);text-decoration-thickness:2px;text-underline-offset:4px}
+  .arrow-line{display:flex;align-items:center;gap:10px;margin-top:22px;font-family:var(--font-latin);font-weight:800;font-size:clamp(21px,2.6vw,33px)}.arrow-line span{color:var(--pink)}
+  .toc-mini{margin-top:22px;background:var(--card2);border:1px solid var(--line);border-left:5px solid var(--pink);border-radius:13px;padding:14px 16px;max-width:920px}.toc-mini-title{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-weight:900}.toc-mini-title span{font-family:var(--font-mono);font-size:11px;color:var(--pink-deep);letter-spacing:.08em;text-transform:uppercase}.toc-mini-grid{display:flex;flex-wrap:wrap;gap:8px}.toc-mini-grid a{display:inline-flex;align-items:center;min-height:31px;padding:0 11px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink-soft);font-size:13px;font-weight:800;text-decoration:none}.toc-mini-grid a:hover{color:#fff;background:var(--pink);border-color:var(--pink)}
+  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}
+  .card{background:var(--card2);border:1px solid var(--line);border-left:5px solid var(--pink);border-radius:12px;padding:16px 18px;box-shadow:0 18px 45px -38px rgba(87,35,64,.35)}.card.teal{border-left-color:var(--teal)}.card.ink{border-left-color:var(--ink)}.card.blue{border-left-color:var(--blue)}.card .k{font-family:var(--font-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px}.card p{font-size:15px;color:var(--ink-soft);line-height:1.48;margin-top:6px}.card b{color:var(--ink)}
+  .compare{display:grid;grid-template-columns:1fr auto 1fr;gap:13px;align-items:stretch;margin-top:20px}.vs{display:flex;align-items:center;justify-content:center;font-family:var(--font-latin);font-weight:800;color:var(--pink);font-size:28px}
+  .quote{font-family:var(--font-latin);font-weight:800;font-size:clamp(30px,5vw,62px);line-height:1.15;max-width:22ch}.quote-mark{font-family:var(--font-latin);font-size:72px;color:var(--pink);opacity:.35;line-height:.5;display:block;margin-bottom:6px}
+  .remote{margin-top:20px;background:linear-gradient(135deg,#fffafb,#f8e7ef);border:1px solid var(--line);border-radius:16px;padding:18px}.remote-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:14px;align-items:stretch}.remote-display{background:var(--ink);color:#fff;border-radius:14px;padding:18px;min-height:230px;display:flex;flex-direction:column;justify-content:space-between}.remote-display .label{font-family:var(--font-mono);font-size:11px;color:#ff9ec6;letter-spacing:.08em;text-transform:uppercase}.remote-display h3{font-size:28px;margin:8px 0}.remote-display p{line-height:1.5;color:rgba(255,255,255,.78)}.remote-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.remote-buttons button{border:1px solid var(--line);background:#fff;border-radius:12px;padding:14px;text-align:left;cursor:pointer;color:var(--ink);font-weight:900;transition:.2s}.remote-buttons button span{display:block;margin-top:5px;font-weight:500;color:var(--muted);font-size:13px;line-height:1.35}.remote-buttons button.on{background:var(--pink);color:#fff;transform:translateY(-2px);border-color:var(--pink)}.remote-buttons button.on span{color:rgba(255,255,255,.78)}
+  .tabbar{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}.tab{font-family:var(--font-cjk);font-weight:800;font-size:14px;border:1px solid var(--line);background:var(--card2);color:var(--muted);padding:8px 15px;border-radius:30px;cursor:pointer;transition:.2s}.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}.case-panel{display:none;margin-top:14px}.case-panel.on{display:grid;grid-template-columns:.78fr 1.22fr;gap:12px;animation:rise .35s ease}.case-copy{background:var(--card2);border:1px solid var(--line);border-left:5px solid var(--pink);border-radius:13px;padding:15px}.case-copy p{color:var(--ink-soft);line-height:1.48;margin-top:8px}.shots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.shot{background:#fff;border:1px solid var(--line);border-radius:11px;padding:7px;cursor:zoom-in;box-shadow:0 16px 38px -34px rgba(87,35,64,.45)}.shot img{display:block;width:100%;height:168px;object-fit:cover;object-position:top;border-radius:7px}.shots .shot img{height:150px}.pdetail-img .shot img{height:145px}.shot figcaption{font-size:11px;color:var(--muted);margin-top:6px}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .mind-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}.mind{border:1px solid var(--line);border-radius:12px;background:var(--card2);padding:13px 14px}.mind b{display:block;margin-bottom:6px}.mind span{display:block;color:var(--muted);font-size:13px;line-height:1.4}
+  .mindmap-mini{margin-top:16px;display:grid;grid-template-columns:1fr 1.15fr;gap:12px;align-items:stretch}.mind-root{border-radius:16px;background:var(--ink);color:#fff;padding:18px;display:flex;flex-direction:column;justify-content:center;min-height:176px}.mind-root .k{font-family:var(--font-mono);font-size:11px;color:#ff9ec6;letter-spacing:.08em;text-transform:uppercase}.mind-root b{display:block;font-size:28px;line-height:1.08;margin-top:8px}.mind-root span{display:block;margin-top:8px;color:rgba(255,255,255,.72);line-height:1.45}.mind-branches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.branch{border:1px solid var(--line);border-left:4px solid var(--pink);border-radius:12px;background:#fff;padding:12px}.branch:nth-child(2n){border-left-color:var(--teal)}.branch:nth-child(3n){border-left-color:var(--blue)}.branch b{display:block;font-size:15px;margin-bottom:4px}.branch span{display:block;color:var(--muted);font-size:12px;line-height:1.35}
+  .bridge-panel{margin-top:20px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,#fffafb,#f8e7ef);padding:16px}.bridge-top{display:grid;grid-template-columns:.95fr 1.05fr;gap:12px}.bridge-command{background:var(--ink);color:#fff;border-radius:14px;padding:17px;display:flex;flex-direction:column;justify-content:space-between;min-height:190px}.bridge-command .k{font-family:var(--font-mono);font-size:11px;color:#ff9ec6;letter-spacing:.08em;text-transform:uppercase}.bridge-command h3{font-size:27px;margin:7px 0}.bridge-command p{color:rgba(255,255,255,.75);line-height:1.45}.bridge-command code{display:block;margin-top:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:10px;font-family:var(--font-mono);font-size:12px;line-height:1.45}.bridge-compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.bridge-card{background:#fff;border:1px solid var(--line);border-left:4px solid var(--pink);border-radius:12px;padding:13px}.bridge-card:nth-child(2){border-left-color:var(--teal)}.bridge-card b{display:block;margin-bottom:5px}.bridge-card span{display:block;color:var(--muted);font-size:13px;line-height:1.4}.bridge-features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}.bridge-feature{background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px}.bridge-feature b{display:block;font-size:14px;margin-bottom:4px}.bridge-feature span{display:block;color:var(--muted);font-size:12px;line-height:1.35}
+  .stepper{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:20px}.pnode{min-width:0;background:var(--card);border:1px solid var(--line);border-top:4px solid var(--line);border-radius:11px;padding:11px 10px;cursor:pointer;opacity:.75;transition:.2s}.pnode.on{background:var(--ink);color:#fff;opacity:1;border-top-color:var(--pink);transform:translateY(-3px)}.pnode .pi{font-family:var(--font-mono);font-size:12px;color:var(--pink-deep)}.pnode.on .pi{color:var(--pink)}.pnode .pz{font-weight:900;font-size:14px;margin-top:3px}.pdetail{background:var(--card2);border-radius:13px;padding:17px 19px;margin-top:12px;border-left:5px solid var(--pink);min-height:112px}.pdetail p{font-size:15.5px;line-height:1.5;color:var(--ink-soft);max-width:84ch}.pdetail code,.copy-code{font-family:var(--font-mono);background:var(--ink);color:#fff;border-radius:8px;padding:3px 7px}.pdetail-img{margin-top:12px;display:none}.pdetail-img.on{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .warn{background:#fff8ec;border:1px solid #f1d3a2;border-left:5px solid #f59e0b;border-radius:13px;padding:16px 18px;margin-top:18px}.warn h3{color:#7a4200}.warn p{color:#6f5b3d;line-height:1.5;margin-top:7px}
+  .prompt-lab{display:grid;grid-template-columns:1fr 1.2fr;gap:14px;margin-top:20px}.prompt-box{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:15px}.prompt-box .k{font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}.messy{color:var(--ink-soft);line-height:1.55}.prompt-out{background:var(--ink);color:#fff;border-radius:13px;padding:15px;font-family:var(--font-mono);font-size:12.5px;line-height:1.55;white-space:pre-wrap;min-height:210px}.btn{border:0;border-radius:10px;background:var(--ink);color:#fff;font-weight:800;padding:10px 14px;cursor:pointer;margin-top:10px}
+  table{width:100%;border-collapse:collapse;margin-top:18px}td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}td:first-child{font-weight:900;color:var(--ink);width:28%}td:last-child{color:var(--muted)}
+  .lightbox{position:fixed;inset:0;background:rgba(20,10,24,.82);display:none;align-items:center;justify-content:center;z-index:100;padding:24px}.lightbox.on{display:flex}.lightbox img{max-width:min(1120px,96vw);max-height:88vh;border-radius:14px;background:#fff;box-shadow:0 24px 80px rgba(0,0,0,.45)}.lightbox button{position:fixed;top:18px;right:22px;border:0;border-radius:999px;background:#fff;color:var(--ink);font-weight:900;padding:10px 14px;cursor:pointer}
+  .reveal{opacity:0;transform:translateY(18px);transition:.7s ease}.reveal.in{opacity:1;transform:none}
+  @media(max-width:900px){.grid4,.mind-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mindmap-mini,.bridge-top{grid-template-columns:1fr}.mind-branches,.bridge-features{grid-template-columns:repeat(3,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid2,.shots,.pdetail-img.on,.prompt-lab{grid-template-columns:repeat(2,minmax(0,1fr))}.case-panel.on{grid-template-columns:.85fr 1.15fr}.compare{grid-template-columns:repeat(2,minmax(0,1fr))}.vs{display:none}.stepper{grid-template-columns:repeat(3,1fr)}.dots{display:none}section{padding:30px 20px}.hero{padding-top:46px}.shot img{height:150px}.shots .shot img,.pdetail-img .shot img{height:136px}.remote-buttons{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:680px){.grid3,.grid4,.mind-grid,.mind-branches,.bridge-features,.bridge-compare,.grid2,.shots,.remote-grid,.case-panel.on,.prompt-lab,.compare,.pdetail-img.on{grid-template-columns:1fr}.stepper{grid-template-columns:repeat(2,1fr)}.shot img,.shots .shot img,.pdetail-img .shot img{height:auto;max-height:220px}.remote-buttons{grid-template-columns:1fr}}
+  @media(max-width:620px){.top-home{top:12px;right:14px}.toc-mini-grid a{width:100%;justify-content:center}.stepper{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="progress" id="bar"></div>
+<nav class="dots" id="dots"></nav>
+<a class="top-home" href="../ai-knowledge-home/index.html">返回主页</a>
+
+<section class="hero" id="s0">
+  <div class="wrap reveal">
+    <div class="num">基础办公</div>
+    <h1>Codex + 飞书：<span class="hot">把协作工具接入 AI&nbsp;Agent</span></h1>
+    <p class="sub">这节课讲清楚飞书 CLI 为什么重要：它让 Codex 这类 AI Agent 能读取、创建、修改飞书里的文档、消息、日程和知识库，把飞书从人与人的协作工具，升级成<strong>人与 AI Agent 的工作入口</strong>。</p>
+    <div class="arrow-line">把飞书里的资料 <span>→</span> 变成 AI&nbsp;Agent 可操作的工作流</div>
+    <div class="toc-mini">
+      <div class="toc-mini-title"><span>Contents</span> 本节目录</div>
+      <div class="toc-mini-grid">
+        <a href="#s1">开场</a><a href="#s2">课程地图</a><a href="#s3">CLI 是什么</a><a href="#s4">展示案例</a><a href="#s6">安装配置</a><a href="#s7">温馨提示</a><a href="#s5">进阶用法</a><a href="#s9">课后作业</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s1">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">开场</span> 为什么飞书需要接入 AI Agent</div>
+    <h2>不是换工具，<span class="hot">而是换协作对象</span></h2>
+    <p class="lead">过去飞书已经很好地解决了人与人之间的协作：聊天、会议、文档、表格、项目推进。但进入 AI Agent 时代之后，协作对象不再只有同事，还会有 Codex、Claude Code、WorkBuddy 这样的 Agent。</p>
+    <div class="compare">
+      <div class="card"><div class="k">Before</div><h3>人与人协作</h3><p>大家在飞书里写文档、开会、传文件，信息主要在同事之间流转。</p></div>
+      <div class="vs">→</div>
+      <div class="card teal"><div class="k">Now</div><h3>人与 AI&nbsp;Agent 协作</h3><p>Agent 需要能读懂资料、调用接口、写回结果，才能真正进入办公流程。</p></div>
+    </div>
+    <div class="grid2">
+      <figure class="shot"><img src="assets/feishu-01.jpg" alt="WorkBuddy 与知识管理讨论截图"><figcaption>从知识管理讨论出发：为什么不用飞书？</figcaption></figure>
+      <figure class="shot"><img src="assets/feishu-02.jpg" alt="飞书 CLI 开源引发讨论截图"><figcaption>飞书 CLI 开源后，开始出现大量 AI + 飞书的实践。</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="s2">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">课程地图</span> 今天抓住五个点</div>
+    <h2>先理解入口，再把它跑起来</h2>
+    <p class="lead">这节课不追求把所有命令记住，而是让大家建立一个清晰判断：先用飞书 CLI 打通底层操作，再理解权限身份，最后再看 Bridge 这种更像“飞书同事”的进阶玩法。</p>
+    <div class="grid4">
+      <div class="card"><div class="k">01</div><h3>理解 CLI</h3><p>把飞书 CLI 理解成给 AI Agent 使用的“遥控器”。</p></div>
+      <div class="card teal"><div class="k">02</div><h3>看案例</h3><p>读取文档、创建文档、定时推送 AI 简报。</p></div>
+      <div class="card blue"><div class="k">03</div><h3>装起来</h3><p>安装工具、扫码授权、检查连接状态。</p></div>
+      <div class="card ink"><div class="k">04</div><h3>用对身份</h3><p>让 Codex 以 user 身份创建，避免权限和编辑问题。</p></div>
+      <div class="card"><div class="k">05</div><h3>进阶用法</h3><p>再把 Codex 变成飞书里的 bot，像同事一样协作。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="s3">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">01</span> 飞书 CLI 是什么</div>
+    <h2>给 AI 一个<span class="hot">遥控器</span></h2>
+    <p class="lead">飞书 CLI 是飞书新推出的命令行工具。对业务同学来说，不用把它理解得很技术：它的意义就是让 AI Agent 可以直接操作飞书，完成查日程、写文档、整理纪要、发消息等自动化办公动作。</p>
+    <div class="remote">
+      <div class="remote-grid">
+        <div class="remote-display" id="remoteDisplay">
+          <div><div class="label">AI Remote</div><h3>读取飞书文档</h3><p>把一个飞书 Wiki 或 Doc 链接交给 Codex，它可以解析标题、目录、正文和上下文，再继续帮你总结、改写或补充内容。</p></div>
+          <small>点击右侧能力按钮，切换 AI 可以操作的飞书对象。</small>
+        </div>
+        <div class="remote-buttons" id="remoteButtons"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s4">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">02</span> 展示案例</div>
+    <h2>从“能看”到<span class="hot">能动手做</span></h2>
+    <p class="lead">真正有价值的不是 AI 能回答关于飞书的问题，而是它能进入你的飞书工作流：读取已有内容、生成新内容、定时推送消息。</p>
+    <div class="tabbar" id="caseTabs"></div>
+    <div id="casePanels"></div>
+  </div>
+</section>
+
+<section id="s6">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">03</span> 如何安装飞书 CLI</div>
+    <h2>安装不是难点，<span class="hot">授权才是关键</span></h2>
+    <p class="lead">安装配置通常分成几个动作：先装 CLI，再扫码授权，最后用 doctor 检查是否真的连上。遇到卡点时，把报错截图给 Codex，让它一步步帮你排查。</p>
+    <div class="stepper" id="installSteps"></div>
+    <div class="pdetail" id="installDetail"></div>
+  </div>
+</section>
+
+<section id="s7">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">温馨提示</span> 创建和编辑权限提醒</div>
+    <h2>让 Codex 以 <span class="hot">user 身份</span> 创建</h2>
+    <p class="lead">授权成功后，你可以直接用自然语言让 AI 操作飞书。但创建文档时要特别注意身份：bot 身份创建的文档，后续可能有权限和编辑问题；user 身份创建，才更像你自己在飞书里操作。</p>
+    <div class="warn"><h3>推荐指令</h3><p>“请用我的 user 身份创建飞书文档，并把生成结果发给我。” Codex 通常会在命令里加上 <code>--as user</code>，这样你后续可以直接打开、编辑和分享。</p></div>
+    <div class="grid2">
+      <figure class="shot"><img src="assets/feishu-15.jpg" alt="bot 身份权限问题截图"><figcaption>bot 身份创建：可能需要额外授权或无法直接编辑。</figcaption></figure>
+      <figure class="shot"><img src="assets/feishu-16.jpg" alt="user 身份创建文档截图"><figcaption>user 身份创建：更符合真实办公中的权限预期。</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">进阶用法</span> Bridge 玩法</div>
+    <h2>把 Codex 变成<span class="hot">飞书里的同事</span></h2>
+    <p class="lead">新文档介绍的是 <strong>Lark Coding Agent Bridge</strong>：它不是替代飞书 CLI，而是把本地 Claude Code / Codex 桥接进飞书，让 coding agent 变成一个可以被聊天、转发、评论和管理会话的飞书 bot。</p>
+    <div class="bridge-panel">
+      <div class="bridge-top">
+        <div class="bridge-command">
+          <div>
+            <div class="k">Start Command</div>
+            <h3>一行命令启动 Bridge</h3>
+            <p>启动后，你可以在手机或电脑飞书里直接和 Codex / Claude Code 对话；已经接入的用户重启即可升级。</p>
+            <code>npx -y lark-channel-bridge@latest start</code>
+          </div>
+          <a class="text-link" href="https://github.com/zarazhangrui/lark-coding-agent-bridge" target="_blank" rel="noopener">查看 GitHub Repo</a>
+        </div>
+        <div class="bridge-compare">
+          <div class="bridge-card"><b>飞书 CLI</b><span>更像底层遥控器：让 Codex 能操作文档、消息、日程、表格等飞书对象。</span></div>
+          <div class="bridge-card"><b>Lark Coding Agent Bridge</b><span>更像协作入口：把 Codex / Claude Code 放进飞书聊天，让你像找同事一样找 Agent。</span></div>
+        </div>
+      </div>
+      <div class="bridge-features">
+        <div class="bridge-feature"><b>手机上直接聊</b><span>散步、通勤时也能语音输入，继续推进任务。</span></div>
+        <div class="bridge-feature"><b>多 session 管理</b><span>一个群是 project，一个 thread 是 session，取代一堆 terminal tabs。</span></div>
+        <div class="bridge-feature"><b>富文本与多媒体</b><span>Agent 可以发图文、表格、长图，而不是只吐一大段文字。</span></div>
+        <div class="bridge-feature"><b>交互式卡片</b><span>用按钮选择、打开文档、恢复会话，比打字选项更自然。</span></div>
+        <div class="bridge-feature"><b>飞书文档承载 specs</b><span>用飞书文档替代 Markdown，反馈时可以直接划词评论。</span></div>
+        <div class="bridge-feature"><b>消息一键转发</b><span>把 leader 任务、用户反馈、群聊上下文直接转给 Codex 处理。</span></div>
+        <div class="bridge-feature"><b>聊天记录留存</b><span>过程留在飞书里，方便检索、回顾和分享。</span></div>
+        <div class="bridge-feature"><b>斜杠命令配置</b><span>/config、/new、/resume、/status、/doctor 等命令管理体验。</span></div>
+        <div class="bridge-feature"><b>多 profile</b><span>可以分别运行 Claude 和 Codex，维护独立应用凭据和会话。</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s9">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">课后作业</span> 先跑通一个最小闭环</div>
+    <h2>让 Codex 真正进入你的飞书</h2>
+    <p class="lead">不用一次做很复杂，先完成一个最小闭环：连接成功、读取一份文档、生成一份新文档、检查权限，然后再考虑更复杂的自动化。</p>
+    <table>
+      <tr><td>01 安装与授权</td><td>完成 <code>npm install -g @larksuite/cli</code> 和 <code>lark-cli config init --new</code>，用飞书扫码授权。</td></tr>
+      <tr><td>02 读取一份文档</td><td>给 Codex 一个飞书 Wiki 或 Doc 链接，让它读取目录和正文，并输出摘要。</td></tr>
+      <tr><td>03 创建一份新文档</td><td>明确要求“用我的 user 身份创建”，检查你是否能打开、编辑和分享。</td></tr>
+      <tr><td>04 发一条消息给自己</td><td>让 Codex 把结果链接和摘要通过飞书消息发给你自己。</td></tr>
+      <tr><td>05 记录一个卡点</td><td>把安装、权限或命令报错记录下来，下次可以沉淀成自己的飞书办公 Skill。</td></tr>
+    </table>
+  </div>
+</section>
+
+<div class="lightbox" id="lightbox"><button type="button">关闭</button><img alt="放大截图"></div>
+
+<script>
+  const sections=[...document.querySelectorAll('section')];
+  const dots=document.getElementById('dots');
+  sections.forEach((s,i)=>{const a=document.createElement('a');a.href='#'+s.id;a.setAttribute('aria-label','跳转到第 '+(i+1)+' 屏');dots.appendChild(a)});
+  const dotLinks=[...dots.children];
+  const reveals=[...document.querySelectorAll('.reveal')];
+  const bar=document.getElementById('bar');
+  function tick(){
+    const max=document.documentElement.scrollHeight-innerHeight;
+    bar.style.width=(max?scrollY/max*100:0)+'%';
+    let current=0;
+    sections.forEach((s,i)=>{if(s.getBoundingClientRect().top<innerHeight*.45)current=i});
+    dotLinks.forEach((d,i)=>d.classList.toggle('on',i===current));
+    reveals.forEach(el=>{if(el.getBoundingClientRect().top<innerHeight*.86)el.classList.add('in')});
+  }
+  addEventListener('scroll',tick,{passive:true});addEventListener('resize',tick);tick();
+
+  const remoteItems=[
+    ['读取飞书文档','解析 Wiki / Doc 链接，读取标题、目录和正文，继续做总结、改写或补充。'],
+    ['创建云文档','把你给出的主题、资料和结构，直接写成一份新的飞书云文档。'],
+    ['发送飞书消息','把日报、简报、提醒、链接发送给自己或指定群聊。'],
+    ['查询日程会议','读取日历安排，整理会议纪要，提炼待办事项。'],
+    ['操作表格数据','读取飞书表格或多维表格，做清洗、统计和记录更新。'],
+    ['生成可视化','把流程、架构、思维导图和项目计划画成飞书画板。']
+  ];
+  const remoteButtons=document.getElementById('remoteButtons');
+  const remoteDisplay=document.getElementById('remoteDisplay');
+  remoteItems.forEach((item,i)=>{
+    const btn=document.createElement('button');
+    btn.innerHTML='<b>'+item[0]+'</b><span>'+item[1]+'</span>';
+    btn.addEventListener('click',()=>{
+      [...remoteButtons.children].forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');
+      remoteDisplay.innerHTML='<div><div class="label">AI Remote</div><h3>'+item[0]+'</h3><p>'+item[1]+'</p></div><small>点击右侧能力按钮，切换 AI 可以操作的飞书对象。</small>';
+    });
+    remoteButtons.appendChild(btn);
+  });
+  remoteButtons.children[0].classList.add('on');
+
+  const cases=[
+    {tab:'读写文档',title:'读取现有飞书文档，进行增添删改',copy:'Codex 可以读取飞书链接，识别文档标题、类型、目录和正文。之后你可以继续要求它补充前情、优化概览、重写段落或检查结构。',imgs:[['assets/feishu-03.jpg','读取飞书 Wiki 文档并解析目录'],['assets/feishu-04.jpg','按要求补充和更新文档内容']]},
+    {tab:'创建文档',title:'直接创建云文档内容',copy:'你可以直接让 Codex 写一份飞书云文档，例如安装教程、会议纪要、工作说明。关键是说明主题、结构、目标读者和创建身份。',imgs:[['assets/feishu-05.jpg','发起创建文档任务'],['assets/feishu-06.jpg','生成新的飞书云文档']]},
+    {tab:'每日简报',title:'每日定时发送 AI 新闻',copy:'把信息源、筛选标准、摘要格式和发送对象固定下来，就可以做成定时推送的 AI 晨间简报。',imgs:[['assets/feishu-07.jpg','定时任务配置示例'],['assets/feishu-08.jpg','飞书里的 AI 晨间简报']]}
+  ];
+  const caseTabs=document.getElementById('caseTabs');
+  const casePanels=document.getElementById('casePanels');
+  cases.forEach((c,i)=>{
+    const tab=document.createElement('button');tab.className='tab'+(i===0?' on':'');tab.textContent=c.tab;
+    const panel=document.createElement('div');panel.className='case-panel'+(i===0?' on':'');
+    panel.innerHTML='<div class="case-copy"><div class="k">Case 0'+(i+1)+'</div><h3>'+c.title+'</h3><p>'+c.copy+'</p></div><div class="shots">'+c.imgs.map(img=>'<figure class="shot"><img src="'+img[0]+'" alt="'+img[1]+'"><figcaption>'+img[1]+'</figcaption></figure>').join('')+'</div>';
+    tab.addEventListener('click',()=>{document.querySelectorAll('#caseTabs .tab').forEach(t=>t.classList.remove('on'));document.querySelectorAll('.case-panel').forEach(p=>p.classList.remove('on'));tab.classList.add('on');panel.classList.add('on')});
+    caseTabs.appendChild(tab);casePanels.appendChild(panel);
+  });
+
+  const install=[
+    {t:'安装 CLI',d:'让 Codex 或你自己的终端执行 npm install -g @larksuite/cli。如果遇到权限问题，可以在终端里用 sudo 或按提示处理。',imgs:[['assets/feishu-10.jpg','Codex 尝试安装 CLI'],['assets/feishu-11.jpg','终端安装与 doctor 检查']]},
+    {t:'扫码授权',d:'执行 lark-cli config init 或 lark-cli config init --new，终端会生成二维码，用飞书 App 扫码完成授权。',imgs:[['assets/feishu-12.jpg','扫码授权二维码']]},
+    {t:'检查连接',d:'运行 lark-cli doctor。如果显示还没有配置，就按提示重新执行 config init --new，再完成浏览器或扫码授权。',imgs:[['assets/feishu-13.jpg','连接状态检查与下一步提示']]},
+    {t:'询问能力',d:'连接成功后，可以直接问 Codex：你现在可以怎么和飞书联动？让它列出可用命令和典型场景。',imgs:[['assets/feishu-14.jpg','Codex 说明飞书 CLI 可用能力']]},
+    {t:'自然语言使用',d:'之后就可以用业务语言下任务，例如：帮我查看今天日程、把这段会议录音整理成纪要、用我的 user 身份创建一份飞书文档。',imgs:[]}
+  ];
+  const installSteps=document.getElementById('installSteps');
+  const installDetail=document.getElementById('installDetail');
+  function renderInstall(i){
+    [...installSteps.children].forEach((n,k)=>n.classList.toggle('on',k===i));
+    const item=install[i];
+    installDetail.innerHTML='<h3>'+item.t+'</h3><p>'+item.d+'</p>'+(item.imgs.length?'<div class="pdetail-img on">'+item.imgs.map(img=>'<figure class="shot"><img src="'+img[0]+'" alt="'+img[1]+'"><figcaption>'+img[1]+'</figcaption></figure>').join('')+'</div>':'');
+  }
+  install.forEach((item,i)=>{const node=document.createElement('button');node.className='pnode';node.innerHTML='<div class="pi">STEP '+String(i+1).padStart(2,'0')+'</div><div class="pz">'+item.t+'</div>';node.addEventListener('click',()=>renderInstall(i));installSteps.appendChild(node)});renderInstall(0);
+
+  const lightbox=document.getElementById('lightbox');
+  const lightImg=lightbox.querySelector('img');
+  document.addEventListener('click',(e)=>{
+    const img=e.target.closest('.shot img');
+    if(img){lightImg.src=img.src;lightImg.alt=img.alt;lightbox.classList.add('on')}
+  });
+  lightbox.addEventListener('click',(e)=>{if(e.target===lightbox||e.target.tagName==='BUTTON')lightbox.classList.remove('on')});
+  addEventListener('keydown',(e)=>{if(e.key==='Escape')lightbox.classList.remove('on')});
+</script>
+</body>
+</html>

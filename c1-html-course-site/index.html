@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HTML：AI时代翻红的PPT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fff4f8;--paper2:#fff9fb;--ink:#241526;--ink-soft:#59415b;--muted:#9c7f8a;
+    --line:#ead2dc;--card:#f8e7ef;--card2:#fffafb;--saffron:#ec4b91;--saffron-deep:#c22d72;
+    --teal:#168f84;--teal-soft:#e5f5f1;--rose:#f06d8f;--blue:#7b73dc;
+    --font-cjk:"Noto Sans SC",system-ui,sans-serif;--font-latin:"Sora",var(--font-cjk);--font-mono:"Space Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font-cjk);background:var(--paper);color:var(--ink);overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 18% 12%,rgba(236,75,145,.13),transparent 24%),radial-gradient(circle at 84% 18%,rgba(255,184,211,.2),transparent 26%),linear-gradient(90deg,rgba(194,45,114,.045) 1px,transparent 1px),linear-gradient(0deg,rgba(194,45,114,.04) 1px,transparent 1px);background-size:auto,auto,46px 46px,46px 46px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.78),rgba(0,0,0,.1));z-index:-1}
+  .progress{position:fixed;top:0;left:0;height:4px;background:var(--saffron);width:0;z-index:50}
+  .dots{position:fixed;right:22px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:9px;z-index:30}
+  .dots a{width:9px;height:9px;border-radius:50%;background:#c9c4bb;cursor:pointer;transition:.2s}.dots a.on{background:var(--saffron);transform:scale(1.35)}
+  section{min-height:auto;padding:38px 7vw;border-bottom:1px solid rgba(194,45,114,.1);display:flex;align-items:center}
+  .wrap{width:min(1120px,100%);margin:0 auto}
+  .hero{min-height:auto;padding-top:54px;padding-bottom:44px;background:var(--paper);position:relative}
+  .num{font-family:var(--font-mono);font-size:14px;color:var(--saffron-deep);letter-spacing:.08em;text-transform:uppercase}
+  .accent-title .soft{color:var(--ink)}
+  .accent-title .hot{color:var(--saffron)}
+  h1{font-family:var(--font-latin);font-size:clamp(44px,7.2vw,92px);line-height:.96;letter-spacing:0;margin:14px 0 16px;max-width:12ch}
+  h1 .hot{color:var(--saffron)}
+  h2{font-family:var(--font-latin);font-size:clamp(34px,4.8vw,60px);line-height:1.05;letter-spacing:0;margin-bottom:14px;max-width:13ch}
+  .opening-title .pink-line{display:block;color:var(--saffron);font-size:1.12em;margin-top:4px}
+  h3{font-size:21px;line-height:1.22}
+  .sub,.lead{font-size:clamp(17px,1.75vw,22px);line-height:1.48;color:var(--ink-soft);max-width:820px}
+  .sub strong,.lead strong{color:var(--ink)}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;color:var(--saffron-deep);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+  .tag{border:1px solid var(--saffron);border-radius:4px;padding:3px 8px;margin-right:9px;background:rgba(236,75,145,.1)}
+  a.text-link,.source-card h3 a,.official-tip a,.linkcard{
+    color:var(--saffron-deep);
+    font-style:italic;
+    text-decoration-line:underline;
+    text-decoration-color:var(--saffron);
+    text-decoration-thickness:2px;
+    text-underline-offset:4px;
+  }
+  a.text-link:hover,.source-card h3 a:hover,.official-tip a:hover,.linkcard:hover{color:var(--saffron)}
+  .top-home{position:fixed;top:18px;right:22px;z-index:60;display:inline-flex;align-items:center;min-height:38px;padding:0 15px;border-radius:999px;background:var(--ink);color:#fff;text-decoration:none;font-weight:900;font-size:14px;box-shadow:0 14px 36px -28px rgba(36,21,38,.65)}
+  .toc-mini{margin-top:22px;background:var(--card2);border:1px solid var(--line);border-left:5px solid var(--saffron);border-radius:13px;padding:14px 16px;max-width:900px}
+  .toc-mini-title{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-weight:900;color:var(--ink)}
+  .toc-mini-title span{font-family:var(--font-mono);font-size:11px;color:var(--saffron-deep);letter-spacing:.08em;text-transform:uppercase}
+  .toc-mini-grid{display:flex;flex-wrap:wrap;gap:8px}
+  .toc-mini-grid a{display:inline-flex;align-items:center;min-height:31px;padding:0 11px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink-soft);font-size:13px;font-weight:800;text-decoration:none}
+  .toc-mini-grid a:hover{color:#fff;background:var(--saffron);border-color:var(--saffron)}
+  @media(max-width:620px){.top-home{top:12px;right:14px}.toc-mini-grid a{width:100%;justify-content:center}}
+  .arrow-line{display:flex;align-items:center;gap:10px;margin-top:24px;font-family:var(--font-latin);font-weight:800;font-size:clamp(21px,2.7vw,34px)}
+  .arrow-line span{color:var(--saffron)}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+  @media(max-width:820px){.grid3,.grid2{grid-template-columns:1fr}.dots{display:none}section{padding:34px 20px}.hero{padding-top:46px;padding-bottom:34px}}
+  .card{background:var(--card2);border:1px solid var(--line);border-left:5px solid var(--saffron);border-radius:12px;padding:16px 18px;box-shadow:0 18px 45px -38px rgba(87,35,64,.35)}
+  .card.teal{border-left-color:var(--teal)}.card.ink{border-left-color:var(--ink)}
+  .card .k{font-family:var(--font-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px}
+  .card p{font-size:15px;color:var(--ink-soft);line-height:1.48;margin-top:6px}.card b{color:var(--ink)}
+  .quote{font-family:var(--font-latin);font-weight:800;font-size:clamp(30px,5vw,64px);line-height:1.15;max-width:24ch}
+  .quote .hl{color:var(--saffron)}.quote-mark{font-family:var(--font-latin);font-size:82px;color:var(--saffron);opacity:.42;line-height:.5;display:block;margin-bottom:6px}
+  .inline-quote{margin-top:16px;border-left:5px solid var(--saffron);background:rgba(236,75,145,.1);border-radius:12px;padding:14px 17px;font-family:var(--font-latin);font-weight:800;font-size:clamp(22px,3vw,34px);line-height:1.18;color:var(--ink)}
+  .inline-quote .hl{color:var(--saffron)}
+  .map-card{min-height:176px;display:flex;flex-direction:column;justify-content:space-between}
+  .map-card .n{font-family:var(--font-mono);font-size:15px;color:var(--saffron-deep);font-weight:700}
+  .map-card h3{font-size:27px}.map-card p{font-size:16px}
+  .compare{display:grid;grid-template-columns:1fr auto 1fr;gap:13px;align-items:stretch;margin-top:20px}
+  .vs{display:flex;align-items:center;justify-content:center;font-family:var(--font-latin);font-weight:800;color:var(--saffron);font-size:28px}
+  @media(max-width:760px){.compare{grid-template-columns:1fr}.vs{display:none}}
+  .mock{background:#fff;border:1px solid var(--line);border-radius:13px;overflow:hidden;box-shadow:0 24px 60px -46px rgba(87,35,64,.5)}
+  .mockbar{height:32px;background:var(--ink);display:flex;align-items:center;gap:7px;padding:0 11px;color:rgba(255,255,255,.62);font-family:var(--font-mono);font-size:11px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#f06d8f}.dot.y{background:#ff9ec6}.dot.g{background:#168f84}
+  .mockbody{padding:16px}.mockbody h4{font-size:21px;margin-bottom:8px}.mockbody p{color:var(--ink-soft);line-height:1.48}
+  .live-html-note{margin-top:12px;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;background:linear-gradient(135deg,#fffafb,#f8e7ef);padding:13px 14px}
+  .live-html-note b{display:inline-flex;align-items:center;justify-content:center;border-radius:9px;background:var(--ink);color:#fff;font-family:var(--font-mono);font-size:13px;padding:9px 11px}
+  .live-html-note span{font-size:16px;line-height:1.45;color:var(--ink-soft)}
+  .repo-shot{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:13px;overflow:hidden;box-shadow:0 22px 60px -44px rgba(87,35,64,.5)}
+  .repo-shot img{display:block;width:100%;max-height:360px;object-fit:cover;object-position:top}
+  .source-card{background:var(--card2);border:1px solid var(--line);border-left:5px solid var(--saffron);border-radius:12px;padding:15px 17px}
+  .source-card .by{font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+  .source-card p{font-size:14px;line-height:1.44;color:var(--ink-soft);margin-top:8px}
+  .copy-code{display:block;margin-top:10px;background:var(--ink);color:#fff;border-radius:10px;padding:11px 13px;font-family:var(--font-mono);font-size:12px;line-height:1.45;word-break:break-word}
+  .tabbar{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+  .tab{font-family:var(--font-cjk);font-weight:700;font-size:14px;border:1px solid var(--line);background:var(--card2);color:var(--muted);padding:8px 15px;border-radius:30px;cursor:pointer;transition:.2s}
+  .tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tabpanel{display:none;margin-top:16px}.tabpanel.on{display:block;animation:rise .35s ease}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+  @media(max-width:900px){.steps{grid-template-columns:1fr}}
+  .step{background:var(--card);border-radius:11px;padding:13px 14px;border-left:5px solid var(--saffron)}
+  .step .sn{font-family:var(--font-mono);color:var(--saffron-deep);font-weight:700;margin-bottom:6px}
+  .step p{font-size:14px;color:var(--ink-soft);line-height:1.42}
+  .stepper{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin-top:20px}
+  .pnode{min-width:0;background:var(--card);border:1px solid var(--line);border-top:4px solid var(--line);border-radius:11px;padding:11px 10px;cursor:pointer;opacity:.72;transition:.2s}
+  .pnode.on{background:var(--ink);color:#fff;opacity:1;border-top-color:var(--saffron);transform:translateY(-3px)}
+  .pnode .pi{font-family:var(--font-mono);font-size:12px;color:var(--saffron-deep)}.pnode.on .pi{color:var(--saffron)}
+  .pnode .pz{font-weight:800;font-size:14px;margin-top:3px}.pnode .pe{font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px}.pnode.on .pe{color:rgba(255,255,255,.55)}
+  .pdetail{background:var(--card2);border-radius:13px;padding:17px 19px;margin-top:12px;border-left:5px solid var(--saffron);min-height:112px}
+  .pdetail h3{font-family:var(--font-latin);margin-bottom:7px}.pdetail p{font-size:15.5px;line-height:1.5;color:var(--ink-soft);max-width:82ch}
+  @media(max-width:980px){.stepper{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:620px){.stepper{grid-template-columns:repeat(2,1fr)}}
+  .prompt-lab{display:grid;grid-template-columns:1fr 1.2fr;gap:14px;margin-top:20px}
+  @media(max-width:850px){.prompt-lab{grid-template-columns:1fr}}
+  textarea,input,select{width:100%;border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px 12px;font-family:var(--font-cjk);font-size:14.5px;color:var(--ink)}
+  textarea{min-height:108px;resize:vertical}
+  .btn{border:0;border-radius:10px;background:var(--ink);color:#fff;font-weight:800;padding:10px 14px;cursor:pointer;margin-top:10px}
+  .prompt-out{background:var(--ink);color:#fff;border-radius:13px;padding:15px;font-family:var(--font-mono);font-size:12.5px;line-height:1.5;white-space:pre-wrap;min-height:176px}
+  .callout{margin-top:16px;background:rgba(236,75,145,.1);border:1px solid rgba(236,75,145,.24);border-left:5px solid var(--saffron);border-radius:12px;padding:14px 16px;color:var(--ink-soft);line-height:1.5}
+  .agent-card{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 24px 60px -48px rgba(87,35,64,.55)}
+  .agent-section{min-height:auto;padding-top:3.5vh;padding-bottom:3.5vh}
+  .agent-card .quote{font-size:clamp(30px,4.4vw,58px);max-width:none}
+  .agent-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:stretch;margin-top:22px}
+  .agent-node{border:1px solid var(--line);border-left:5px solid var(--saffron);border-radius:12px;background:linear-gradient(135deg,#fffafb,#f8e7ef);padding:14px 15px}
+  .agent-node:nth-child(3){border-left-color:var(--teal)}
+  .agent-node:nth-child(5){border-left-color:var(--ink)}
+  .agent-node b{display:block;font-size:17px;margin-bottom:5px}.agent-node span{display:block;font-size:13px;color:var(--muted);line-height:1.35}
+  .agent-arrow{display:flex;align-items:center;color:var(--saffron);font-size:24px;font-weight:900}
+  @media(max-width:760px){.agent-flow{grid-template-columns:1fr}.agent-arrow{display:none}}
+  .compact-practice{min-height:auto;padding-top:3vh;padding-bottom:3vh}
+  .compact-practice h2{font-size:clamp(28px,3.4vw,42px);max-width:none;margin-bottom:10px}
+  .official-tips{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+  .official-tip{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px 14px}
+  .official-tip b{font-size:16px}.official-tip p{font-size:13.5px;line-height:1.42;color:var(--ink-soft);margin-top:5px}
+  .official-tip a{font-weight:800}
+  @media(max-width:920px){.official-tips{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:620px){.official-tips{grid-template-columns:1fr}}
+  .links{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
+  @media(max-width:760px){.links{grid-template-columns:1fr}}
+  .linkcard{display:block;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+  .linkcard span{display:block;font-family:var(--font-mono);font-size:11px;color:var(--saffron-deep);margin-bottom:5px}
+  table{width:100%;border-collapse:collapse;margin-top:18px}td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}td:first-child{font-weight:800;color:var(--ink);width:26%}td:last-child{color:var(--muted)}
+  .reveal{opacity:0;transform:translateY(18px);transition:.7s ease}.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="progress" id="bar"></div>
+<nav class="dots" id="dots"></nav>
+<a class="top-home" href="../ai-knowledge-home/index.html">返回主页</a>
+
+<section class="hero" id="s0">
+  <div class="wrap reveal">
+    <div class="num">基础办公</div>
+    <h1>HTML：<span class="hot">AI时代翻红的PPT</span></h1>
+    <p class="sub">这里会讲清楚什么是 HTML，以及它为什么会在 AI 时代重新翻红：当内容、结构和风格都能被文本描述，Codex 就能把它做成可展示、可修改、可交互的网页式汇报。</p>
+    <div class="arrow-line">把 PPT 思维 <span>→</span> 变成 AI 可协作的 HTML 交付物</div>
+    <div class="toc-mini">
+      <div class="toc-mini-title"><span>Contents</span> 本节目录</div>
+      <div class="toc-mini-grid">
+        <a href="#s1">开场</a>
+        <a href="#s2">课程地图</a>
+        <a href="#s3">01 先理解 HTML</a>
+        <a href="#s5">02 模板案例</a>
+        <a href="#s6">03 六步流程</a>
+        <a href="#s8">练习</a>
+        <a href="#s9">修改 HTML</a>
+        <a href="#s10">课后作业</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s1">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">开场</span> 为什么不是继续做 PPT</div>
+    <h2 class="opening-title">PPT 适合人，<span class="pink-line">HTML 画布适合 AI</span></h2>
+    <p class="lead">非 AI 时代，我们用 PPT 拖文本框、调图片、改排版，这是合理的。但 AI 更擅长处理结构化文本：标题、段落、卡片、图表、颜色、布局都能被清楚生成和修改。HTML 的优势不只是“好看”，而是<strong>更容易被 AI 生成、预览、分享和迭代</strong>。</p>
+    <div class="compare">
+      <div class="card"><div class="k">PPT Workflow</div><h3>人手动排版</h3><p>图层、文本框、对象关系复杂。AI 能辅助，但很容易出现对不齐、改一处乱一片的问题。</p></div>
+      <div class="vs">VS</div>
+      <div class="card teal"><div class="k">HTML Workflow</div><h3>AI 生成结构</h3><p>HTML/CSS/JS 都是文本。你说清楚结构和风格，Codex 就能稳定生成、修改和复用。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="s2">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">课程地图</span> 今天要学会的三件事</div>
+    <h2>今天走三步</h2>
+    <p class="lead">本节重点放在一种新的办公协作方式：业务人员提供内容和判断，Codex 负责把它做成可交付的视觉作品。</p>
+    <div class="grid3">
+      <div class="card map-card"><div class="n">01</div><h3>理解 HTML</h3><p>为什么它比 PPT 更适合 AI 生成、修改、交互和分享。</p></div>
+      <div class="card teal map-card"><div class="n">02</div><h3>套用 / 定制模板</h3><p>用模板库让 Codex 继承成熟设计系统，而不是从零写 CSS。</p></div>
+      <div class="card ink map-card"><div class="n">03</div><h3>持续修改</h3><p>把“我要改哪里”讲清楚，让网页汇报资料可以反复迭代。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="s3">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">01</span> HTML 是新的展示容器</div>
+    <h2>先理解 HTML</h2>
+    <div class="grid3">
+      <div class="card"><div class="k">Structure</div><h3>内容有结构</h3><p>标题、段落、卡片、表格、图表都能被明确描述，AI 不需要猜你拖了几个文本框。</p></div>
+      <div class="card teal"><div class="k">Preview</div><h3>结果可预览</h3><p>生成后直接在浏览器打开，本地就能看，改动也能马上验证。</p></div>
+      <div class="card ink"><div class="k">Interaction</div><h3>天然可交互</h3><p>标签切换、点击放大、输入框、图表动画，都可以变成汇报的一部分。</p></div>
+    </div>
+    <div class="mock" style="margin-top:18px">
+      <div class="mockbar"><span class="dot"></span><span class="dot y"></span><span class="dot g"></span> report.local/index.html</div>
+      <div class="mockbody">
+        <h4>网页式汇报资料</h4>
+        <p>现在你正在阅读的这一份课程材料，本身就是一个 HTML 页面。它可以像 PPT 一样展示，也可以像网页一样交互；更重要的是，它背后是一份可以被 AI 读懂、修改和版本管理的文本文件。</p>
+        <div class="live-html-note">
+          <b>index.html</b>
+          <span>你看到的标题、卡片、配色、间距、按钮和交互，都可以被 Codex 直接定位并修改。</span>
+        </div>
+      </div>
+    </div>
+    <p class="inline-quote">HTML 更好地接住了 <span class="hl">AI Agent</span></p>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">02</span> 下载别人的 HTML 模板</div>
+    <h2>以张咋啦的模板为例</h2>
+    <p class="lead">不要从零开始写 CSS。先借一个成熟模板库，让 Codex 继承它的页面比例、字体、颜色、布局和交互规则，再把你的真实内容替换进去。</p>
+    <div class="grid2">
+      <div class="source-card">
+        <div class="by">Reference</div>
+        <h3><a href="https://www.xiaohongshu.com/explore/69fe6f3a000000001a036be4?app_platform=android&amp;ignoreEngage=true&amp;app_version=9.32.0&amp;share_from_user_hidden=true&amp;xsec_source=app_share&amp;type=video&amp;xsec_token=CBrAaYUu9061noA-JiUbI-78Kc7-873rkmvCAtBbDKGhM=&amp;author_share=1&amp;shareRedId=ODZINjk1Ozw2NzUyOTgwNjY0OThJO0g9&amp;apptime=1780125316&amp;share_id=96212882f5c2447cb151da5b7893804e&amp;share_channel=copy_link&amp;appuid=60f66073000000000101e6b4&amp;xhsshare=CopyLink" target="_blank" rel="noopener">张咋啦：如何用 AI 做出超级好看的 HTML Slides - 小红书</a></h3>
+        <p>课程里可以直接引用这个案例：它指向 Zara Zhang 的 <b>beautiful-html-templates</b>，本质是一套给 Codex/AI agent 使用的 HTML slide deck 模板库。</p>
+        <span class="copy-code">Clone https://github.com/zarazhangrui/beautiful-html-templates and follow the instructions in AGENTS.md to build me a beautiful HTML slide deck.</span>
+      </div>
+      <div class="repo-shot"><img src="assets/beautiful-html-templates-github.png" alt="beautiful-html-templates GitHub 仓库截图"></div>
+    </div>
+    <div class="tabbar">
+      <button class="tab on" data-group="tpl" data-idx="0">模板库是什么</button>
+      <button class="tab" data-group="tpl" data-idx="1">它能做什么</button>
+    </div>
+    <div class="tabpanel on" data-group="tpl" data-idx="0">
+      <div class="grid2">
+        <div class="card"><h3>不只是一个 HTML 文件</h3><p>它通常包含模板页面、CSS/JS、字体、视觉系统、模板索引和一份 AGENTS.md，让 Codex 知道如何挑选、预览和生成。</p></div>
+        <div class="mock"><div class="mockbar"><span class="dot"></span><span class="dot y"></span><span class="dot g"></span> beautiful-html-templates</div><div class="mockbody"><p><b>index.json</b>：描述模板风格<br><b>templates/</b>：模板文件夹<br><b>AGENTS.md</b>：告诉 Codex 怎么工作</p></div></div>
+      </div>
+    </div>
+    <div class="tabpanel" data-group="tpl" data-idx="1">
+      <div class="grid3">
+        <div class="card"><h3>内部汇报</h3><p>季度复盘、项目汇报、培训材料。</p></div>
+        <div class="card teal"><h3>研究报告</h3><p>调研结论、趋势洞察、案例整理。</p></div>
+        <div class="card ink"><h3>产品发布</h3><p>功能介绍、品牌宣言、方案提案。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s6">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">03</span> Codex 做模板的六步流程</div>
+    <h2 class="accent-title"><span class="soft">先预览，</span><span class="hot">再生成</span></h2>
+    <p class="lead">好的流程不是“把资料丢给 AI 让它自由发挥”，而是让 Codex 先理解场合和风格，给你看候选封面，再进入完整制作。</p>
+    <div class="stepper" id="stepper"></div>
+    <div class="pdetail" id="pdetail"></div>
+  </div>
+</section>
+
+<section id="s7" class="agent-section">
+  <div class="wrap reveal">
+    <div class="agent-card">
+      <p class="quote">模板不是素材，而是一套<span class="hl">视觉生产方式</span>。</p>
+      <div class="agent-flow">
+        <div class="agent-node"><b>模板库</b><span>页面比例、字体、颜色和组件规则</span></div>
+        <div class="agent-arrow">→</div>
+        <div class="agent-node"><b>AI Agent</b><span>理解场合，挑选方向，生成预览</span></div>
+        <div class="agent-arrow">→</div>
+        <div class="agent-node"><b>可交付网页</b><span>替换内容，保留设计系统，继续迭代</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s8" class="compact-practice">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">练习</span> 把需求说清楚</div>
+    <h2>练习：把需求说清楚</h2>
+    <p class="lead">如果你只说“帮我做个好看的网页”，Codex 会猜。更好的方式是把业务场景、听众、风格边界和内容结构一次讲明白。</p>
+    <div class="prompt-lab">
+      <div>
+        <textarea id="topic">我想做一个汇报网页，主题大概是讲 AI 怎么帮我们做办公。
+最好好看一点，不要太像 PPT，也别太花。
+听众就是公司同事，大家不一定懂技术。
+内容可能包括：为什么现在要学 AI、平时能用在哪些地方、举几个例子，最后给大家一个作业。
+我还没想好结构，你帮我整理一下。</textarea>
+        <button class="btn" onclick="makePrompt()">生成可复制 Prompt</button>
+      </div>
+      <div class="prompt-out" id="promptOut"></div>
+    </div>
+  </div>
+</section>
+
+<section id="s9">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">04</span> 如何在 Codex 中修改 HTML</div>
+    <h2>如何在 Codex 中修改 HTML</h2>
+    <p class="lead">修改 HTML 的关键是把问题定位清楚：哪一屏、哪个模块、哪里不舒服、希望改成什么。越具体，Codex 越能稳定修改。</p>
+    <div class="steps">
+      <div class="step"><div class="sn">定位</div><h3>说清楚位置</h3><p>例如：开场 section、三张地图卡、第二个 tab、最后的作业表格。</p></div>
+      <div class="step"><div class="sn">描述</div><h3>说清楚问题</h3><p>例如：间距太窄、标题太抽象、卡片文字太多、移动端拥挤。</p></div>
+      <div class="step"><div class="sn">目标</div><h3>说清楚方向</h3><p>例如：保持现有圆角和配色，只把这里改成三栏案例结构。</p></div>
+    </div>
+    <div class="callout">更好的修改指令：<b>“保持当前视觉风格，把第 3 屏的长段落改成 3 个小卡片，每个卡片有标题、一句话解释和一个关键词。”</b></div>
+    <div class="official-tips">
+      <div class="official-tip"><b>1. 打开本地页面</b><p>在 Codex 的 in-app browser 里打开本地 HTML，先看真实渲染效果，再决定改哪里。</p></div>
+      <div class="official-tip"><b>2. 框选具体区域</b><p>开启 Annotation mode，点选元素；需要框选一块区域时，按住 <b>Shift</b> 再点击。</p></div>
+      <div class="official-tip"><b>3. 调样式再提交</b><p>点评论框旁边的配置按钮，可以改字体、文字、间距、颜色，并在页面上预览效果。</p></div>
+      <div class="official-tip"><b>4. 让 Codex 落代码</b><p>提交评论后，让 Codex 根据这些标注修改 HTML/CSS。参考 <a href="https://developers.openai.com/codex/app/browser" target="_blank" rel="noopener">OpenAI 官方说明</a>。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="s10">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">课后</span> 推荐阅读与作业</div>
+    <h2>课后作业</h2>
+    <table>
+      <tr><td>作业场景</td><td>选一个你最近要汇报的内容：项目复盘、调研结论、活动方案、培训材料都可以。</td></tr>
+      <tr><td>内容结构</td><td>先写清楚 6-8 个 section：封面、背景、问题、方案、案例、结论、行动。</td></tr>
+      <tr><td>风格要求</td><td>告诉 Codex 场合、听众、正式程度、颜色偏好，以及“不想要什么”。</td></tr>
+      <tr><td>验收方式</td><td>本地打开 HTML，看标题、间距、移动端、图片和交互是否都能正常工作。</td></tr>
+    </table>
+    <div class="links">
+      <a class="linkcard" href="http://xhslink.com/o/32slTU4zRS"><span>Reading 01</span>用 Codex 做出能交付的 PPT / HTML 作品</a>
+      <a class="linkcard" href="http://xhslink.com/o/3hOrDrVqLAI"><span>Reading 02</span>AI 设计的新大陆：SVG 与可编辑视觉</a>
+      <a class="linkcard" href="http://xhslink.com/o/8bbhbksXFCK"><span>Reading 03</span>让 Codex 变得越来越聪明的小方法</a>
+      <a class="linkcard" href="http://xhslink.com/o/1q6KaNOyqlT"><span>Reading 04</span>Codex App 对非程序员的办公价值</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  const secs=[...document.querySelectorAll('section[id]')];
+  const labels=['封面','开场','地图','HTML','模板','六步','方法','练习','修改','作业'];
+  const dots=document.getElementById('dots');
+  secs.forEach((s,i)=>{const a=document.createElement('a');a.title=labels[i]||s.id;a.onclick=()=>s.scrollIntoView({behavior:'smooth'});dots.appendChild(a);});
+  const dotEls=[...dots.children],bar=document.getElementById('bar');
+  function onScroll(){const h=document.documentElement;bar.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';let a=0;secs.forEach((s,i)=>{if(s.getBoundingClientRect().top<=innerHeight*.42)a=i});dotEls.forEach((d,i)=>d.classList.toggle('on',i===a));}
+  addEventListener('scroll',onScroll,{passive:true});
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  addEventListener('keydown',e=>{if(!['ArrowDown','ArrowUp','PageDown','PageUp'].includes(e.key))return;e.preventDefault();let c=0;secs.forEach((s,i)=>{if(s.getBoundingClientRect().top<=innerHeight*.4)c=i});const t=Math.max(0,Math.min(secs.length-1,c+((e.key==='ArrowDown'||e.key==='PageDown')?1:-1)));secs[t].scrollIntoView({behavior:'smooth'});});
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{const g=t.dataset.group,i=t.dataset.idx;document.querySelectorAll('.tab[data-group="'+g+'"]').forEach(x=>x.classList.toggle('on',x.dataset.idx===i));document.querySelectorAll('.tabpanel[data-group="'+g+'"]').forEach(p=>p.classList.toggle('on',p.dataset.idx===i));});
+
+  const flow=[
+    {en:'task',zh:'给明确任务',body:'先说清主题、场合、听众和风格。不要只说“做一个好看的 deck”，而要给 Codex 判断边界。'},
+    {en:'brief',zh:'回答两个问题',body:'模板流程通常会追问 occasion 和 mood：这决定了它是做成专业汇报、课堂开场，还是品牌发布。'},
+    {en:'select',zh:'挑 3 个候选模板',body:'Codex 读取 index.json，根据场合、情绪、正式程度、信息密度挑出 3 个不一样的方向。'},
+    {en:'preview',zh:'生成封面预览',body:'先只做封面。你看到真实标题和副标题放进去后的效果，再决定用哪套视觉系统。'},
+    {en:'build',zh:'制作完整网页',body:'选定模板后，Codex 才替换完整内容、增删 section，并沿用模板的字体、颜色和交互。'},
+    {en:'iterate',zh:'打开并继续修改',body:'浏览器打开本地 HTML，针对具体页面继续改标题、间距、卡片、图片和交互，直到能交付。'}
+  ];
+  const stepper=document.getElementById('stepper'),pdetail=document.getElementById('pdetail');
+  stepper.innerHTML=flow.map((p,i)=>'<div class="pnode" data-i="'+i+'"><div class="pi">'+String(i+1).padStart(2,'0')+'</div><div class="pz">'+p.zh+'</div><div class="pe">'+p.en+'</div></div>').join('');
+  function showStep(i){document.querySelectorAll('.pnode').forEach((n,j)=>n.classList.toggle('on',j<=i));const p=flow[i];pdetail.innerHTML='<h3>'+(i+1)+'. '+p.zh+' <span style="font-family:var(--font-mono);font-size:13px;color:var(--muted);font-weight:400">'+p.en+'</span></h3><p>'+p.body+'</p>';}
+  document.querySelectorAll('.pnode').forEach(n=>n.onclick=()=>showStep(+n.dataset.i));
+  function makePrompt(){
+    const v=document.getElementById('topic').value.trim();
+    document.getElementById('promptOut').textContent=
+`请把下面这段比较口语、模糊的需求，整理成一份可以直接交给 Codex 执行的 HTML 课程网页制作 prompt。
+
+【原始需求】
+${v}
+
+【整理后的任务】
+请帮我制作一个单页 HTML 课程网页，主题是：AI 如何帮助业务同事提升日常办公效率。
+
+【使用场景】
+- 公司内部分享 / 基础办公工作坊
+- 听众是业务同事，不默认具备技术背景
+- 页面要能直接打开、讲解和分享
+
+【页面结构】
+1. 封面：说明课程主题和核心价值
+2. 开场：为什么现在要学习 AI 办公
+3. 方法：AI 能处理哪些办公任务
+4. 案例：用 3-4 个真实办公场景说明
+5. 练习：给听众一个可操作的小任务
+6. 总结：收束成一套可复用的工作方法
+
+【视觉风格】
+- 温暖、清晰、有一点手账感
+- 以淡粉色 / 米白色为主
+- 不要太像传统 PPT，也不要过度花哨
+- 卡片和文字要紧凑，适合现场讲课
+
+【交互要求】
+- 可以有目录跳转
+- 适合用卡片、Tab、Stepper 或小 Demo 展示
+- 所有链接要明显可识别
+
+请先给出页面结构，再开始生成 HTML。`;
+  }
+  showStep(0);makePrompt();onScroll();
+</script>
+</body>
+</html>
