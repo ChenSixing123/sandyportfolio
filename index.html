@@ -410,6 +410,61 @@
   .scenario-card:nth-child(2){border-top-color:var(--rose)}
   .scenario-card:nth-child(3){border-top-color:var(--teal)}
   .scenario-card:nth-child(4){border-top-color:var(--blue)}
+  .project-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:18px;
+  }
+  .project-card{
+    display:grid;
+    grid-template-columns:minmax(280px,.92fr) minmax(0,1fr);
+    gap:22px;
+    align-items:stretch;
+    padding:18px;
+    border:2px solid rgba(121,70,82,.14);
+    border-radius:30px;
+    background:linear-gradient(145deg,#fffaf4,#ffeaf2);
+    box-shadow:12px 12px 0 rgba(236,75,145,.11), inset 0 1px 0 rgba(255,255,255,.7);
+  }
+  .project-shot{
+    min-height:280px;
+    border:1px solid rgba(36,22,37,.12);
+    border-radius:22px;
+    overflow:hidden;
+    background:#fff;
+  }
+  .project-shot img{
+    width:100%;
+    height:100%;
+    min-height:280px;
+    display:block;
+    object-fit:cover;
+    object-position:left top;
+  }
+  .project-copy{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:8px 4px;
+  }
+  .project-copy h3{
+    font-family:var(--font-display);
+    font-size:clamp(34px,4vw,54px);
+    line-height:1.02;
+    margin-bottom:14px;
+  }
+  .project-copy p{
+    color:var(--ink-soft);
+    line-height:1.68;
+    font-size:17px;
+    max-width:620px;
+  }
+  .project-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:18px;
+  }
   .card-num{
     font-family:var(--font-cjk);
     font-size:13px;
@@ -611,6 +666,7 @@
     .hero-grid{grid-template-columns:minmax(0,1fr) minmax(220px,.32fr);gap:24px}
     h1{font-size:clamp(48px,7vw,82px)}
     .profile-card{width:min(100%,260px)}
+    .project-card{grid-template-columns:1fr}
     .scenario-grid{grid-template-columns:repeat(2,1fr)}
     .method{grid-template-columns:1fr;gap:10px}
     .arrow{display:none}
@@ -627,6 +683,8 @@
     .section-head{display:block}
     .section-head p{margin-top:10px}
     .scenario-grid,.chooser{grid-template-columns:1fr}
+    .project-card{padding:14px;border-radius:24px}
+    .project-shot,.project-shot img{min-height:210px}
     .scenario-card{min-height:205px}
     .path-item{grid-template-columns:34px 1fr}
     .path-item.has-image{grid-template-columns:34px 1fr}
@@ -644,8 +702,8 @@
     </a>
     <nav class="nav" aria-label="页面导航">
       <a href="#top">Home</a>
+      <a href="#projects">Project</a>
       <a href="#scenarios">Workshop</a>
-      <a href="#scenario-detail">Project</a>
     </nav>
   </div>
 </header>
@@ -659,17 +717,47 @@
           <h1><span class="title-name">Sandy's</span> <span class="title-ai">AI</span> <span class="title-journal">Journal</span></h1>
         </div>
         <p class="lead">Hello 大家，欢迎来到我的 AI 学习 Online 手账本。我一直在探索 AI 如何进入真实的商业场景当中，自己平时没事就琢磨着做一些有意思的 AI 小工具。</p>
-        <p class="lead" style="font-size:clamp(16px,1.55vw,20px);margin-top:14px">Workshop 是我探索的一些实用的 AI 实践，我做成了有趣的互动网页分享给大家。如果你觉得好的话，点个赞吧！</p>
+        <p class="lead" style="font-size:clamp(16px,1.55vw,20px);margin-top:14px">Project 是我真的动手做出来的小工具；Workshop 是我整理出来的 AI 实践教程。一个偏作品，一个偏分享，慢慢都会放在这里。</p>
       </div>
       <aside class="hero-side reveal" aria-label="Sandy 无眼镜毛毡小人形象">
         <div class="profile-card">
           <img class="profile-photo" src="assets/sandy-felt-typing-cutout.png" alt="Sandy 无眼镜毛毡小人正在敲电脑">
         </div>
         <div class="hero-actions">
-          <a class="btn" href="#scenarios">查看 Workshop</a>
+          <a class="btn" href="#projects">查看 Project</a>
           <a class="btn secondary" href="#contact">联系我</a>
         </div>
       </aside>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <div class="eyebrow">AI Project Gallery</div>
+          <h2>Project</h2>
+        </div>
+        <p>这里放我真正做出来的 AI 小工具和实验项目。它们不只是教程，而是从一个真实需求开始，一步步被搭出来、修出来、发布出来的作品。</p>
+      </div>
+      <div class="project-grid">
+        <article class="project-card reveal">
+          <a class="project-shot" href="feishu-web-clipper-story/index.html" aria-label="查看 Feishu Web Clipper 项目故事">
+            <img src="feishu-web-clipper-story/images/plugin-popup-cornell.png" alt="Feishu Web Clipper 插件弹窗预览">
+          </a>
+          <div class="project-copy">
+            <div class="card-num">01 / Chrome Extension · Feishu · DeepSeek</div>
+            <h3>Feishu Web Clipper</h3>
+            <p>一个把网页一键收藏到飞书知识库的 Chrome 插件。它可以提取网页正文，保存成飞书文档，也可以调用 DeepSeek，把内容整理成康奈尔笔记法。</p>
+            <div class="tags"><span>Chrome 插件</span><span>飞书知识库</span><span>Cornell Notes</span><span>DeepSeek</span></div>
+            <div class="project-actions">
+              <a class="path-link" href="feishu-web-clipper-story/index.html">项目故事</a>
+              <a class="path-link" href="https://github.com/ChenSixing123/cornell_feishu_web_clipper" target="_blank" rel="noreferrer">GitHub</a>
+              <a class="path-link" href="https://www.xiaohongshu.com/discovery/item/6a4652cf000000001101dbdb?source=webshare&xhsshare=pc_web&xsec_token=ABdfOCRV9u3vUw_WokN2mP1clooTJnPCY52PS7bKoAG00=&xsec_source=pc_share" target="_blank" rel="noreferrer">小红书</a>
+            </div>
+          </div>
+        </article>
+      </div>
     </div>
   </section>
 
@@ -791,19 +879,8 @@
       kicker: 'Knowledge System',
       title: '知识管理',
       desc: '把个人经验和团队资料沉淀成可复用能力。重点不是把资料存起来，而是让资料、SOP 和专家判断能被 AI 调用。',
-      links: ['Obsidian', 'FastGPT', '飞书知识库', 'Web Clipper'],
+      links: ['Obsidian', 'FastGPT', '飞书知识库'],
       path: [
-        {
-          title: 'Feishu Web Clipper：一键收藏网页到飞书知识库',
-          desc: '一个从真实需求做出来的 Chrome 插件：提取网页内容，保存到飞书知识库，并可用 DeepSeek 整理成康奈尔笔记。这里放项目故事、开源代码和小红书分享。',
-          href: 'feishu-web-clipper-story/index.html',
-          image: 'feishu-web-clipper-story/images/plugin-popup-cornell.png',
-          actions: [
-            { label: '项目故事', href: 'feishu-web-clipper-story/index.html' },
-            { label: 'GitHub', href: 'https://github.com/ChenSixing123/cornell_feishu_web_clipper', external: true },
-            { label: '小红书', href: 'https://www.xiaohongshu.com/discovery/item/6a4652cf000000001101dbdb?source=webshare&xhsshare=pc_web&xsec_token=ABdfOCRV9u3vUw_WokN2mP1clooTJnPCY52PS7bKoAG00=&xsec_source=pc_share', external: true }
-          ]
-        },
         {
           title: 'WorkBuddy x Obsidian：丝滑的知识库管理体系',
           desc: '我好像发现了一个很顺手的个人知识管理组合：用 Obsidian 沉淀资料，用 WorkBuddy 把知识真正调动起来。',
