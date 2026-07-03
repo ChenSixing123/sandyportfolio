@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Agent Reach Skill：让 Agent 看见真实世界</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fff4f8;--paper2:#fff9fb;--ink:#241526;--ink-soft:#59415b;--muted:#9c7f8a;
+    --line:#ead2dc;--card:#f8e7ef;--card2:#fffafb;--saffron:#ec4b91;--saffron-deep:#c22d72;
+    --teal:#168f84;--teal-soft:#e5f5f1;--rose:#f06d8f;--blue:#7b73dc;
+    --font-cjk:"Noto Sans SC",system-ui,sans-serif;--font-latin:"Sora",var(--font-cjk);--font-mono:"Space Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font-cjk);background:var(--paper);color:var(--ink);overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 18% 12%,rgba(236,75,145,.13),transparent 24%),radial-gradient(circle at 84% 18%,rgba(255,184,211,.2),transparent 26%),linear-gradient(90deg,rgba(194,45,114,.045) 1px,transparent 1px),linear-gradient(0deg,rgba(194,45,114,.04) 1px,transparent 1px);background-size:auto,auto,46px 46px,46px 46px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.78),rgba(0,0,0,.1));z-index:-1}
+  .progress{position:fixed;top:0;left:0;height:4px;background:var(--saffron);width:0;z-index:50}
+  .dots{position:fixed;right:22px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:9px;z-index:30}
+  .dots a{width:9px;height:9px;border-radius:50%;background:#c9c4bb;cursor:pointer;transition:.2s}.dots a.on{background:var(--saffron);transform:scale(1.35)}
+  section{min-height:auto;padding:34px 7vw;border-bottom:1px solid rgba(194,45,114,.1);display:flex;align-items:center}
+  .wrap{width:min(1180px,100%);margin:0 auto}
+  .hero{min-height:auto;padding-top:50px;padding-bottom:38px;background:var(--paper);position:relative}
+  .num{font-family:var(--font-mono);font-size:14px;color:var(--saffron-deep);letter-spacing:.08em;text-transform:uppercase}
+  h1{font-family:var(--font-latin);font-size:clamp(36px,4.8vw,62px);line-height:1.06;letter-spacing:0;margin:12px 0 14px;max-width:24ch}
+  h1 .hot{color:var(--saffron)}
+  h2{font-family:var(--font-latin);font-size:clamp(29px,3.4vw,42px);line-height:1.14;letter-spacing:0;margin-bottom:12px;max-width:26ch}
+  h3{font-size:20px;line-height:1.24}
+  .opening-title .pink-line{display:inline;color:var(--saffron);font-size:1em;margin-top:0}
+  .sub,.lead{font-size:clamp(16px,1.45vw,20px);line-height:1.52;color:var(--ink-soft);max-width:920px}
+  .sub strong,.lead strong{color:var(--ink)}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;color:var(--saffron-deep);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+  .tag{border:1px solid var(--saffron);border-radius:4px;padding:3px 8px;margin-right:9px;background:rgba(236,75,145,.1)}
+  a.text-link,.linkcard{color:var(--saffron-deep);font-style:italic;text-decoration-line:underline;text-decoration-color:var(--saffron);text-decoration-thickness:2px;text-underline-offset:4px}
+  .top-home{position:fixed;top:18px;right:22px;z-index:60;display:inline-flex;align-items:center;min-height:38px;padding:0 15px;border-radius:999px;background:var(--ink);color:#fff;text-decoration:none;font-weight:900;font-size:14px;box-shadow:0 14px 36px -28px rgba(36,21,38,.65)}
+  .toc-mini{margin-top:22px;background:var(--card2);border:1px solid var(--line);border-left:5px solid var(--saffron);border-radius:13px;padding:14px 16px;max-width:900px}
+  .toc-mini-title{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-weight:900;color:var(--ink)}
+  .toc-mini-title span{font-family:var(--font-mono);font-size:11px;color:var(--saffron-deep);letter-spacing:.08em;text-transform:uppercase}
+  .toc-mini-grid{display:flex;flex-wrap:wrap;gap:8px}
+  .toc-mini-grid a{display:inline-flex;align-items:center;min-height:31px;padding:0 11px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink-soft);font-size:13px;font-weight:800;text-decoration:none}
+  .toc-mini-grid a:hover{color:#fff;background:var(--saffron);border-color:var(--saffron)}
+  .arrow-line{display:flex;align-items:center;gap:10px;margin-top:20px;font-family:var(--font-latin);font-weight:800;font-size:clamp(19px,2.25vw,28px)}
+  .arrow-line span{color:var(--saffron)}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+  .card{background:var(--card2);border:1px solid var(--line);border-left:5px solid var(--saffron);border-radius:12px;padding:16px 18px;box-shadow:0 18px 45px -38px rgba(87,35,64,.35)}
+  .card.teal{border-left-color:var(--teal)}.card.ink{border-left-color:var(--ink)}
+  .card .k{font-family:var(--font-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px}
+  .card p,.card li{font-size:15px;color:var(--ink-soft);line-height:1.48;margin-top:6px}.card b{color:var(--ink)}
+  .card ul{padding-left:18px;margin-top:8px}
+  .quote{font-family:var(--font-latin);font-weight:800;font-size:clamp(28px,3.8vw,46px);line-height:1.16;max-width:30ch}
+  .quote .hl{color:var(--saffron)}.quote-mark{font-family:var(--font-latin);font-size:82px;color:var(--saffron);opacity:.42;line-height:.5;display:block;margin-bottom:6px}
+  .inline-quote{margin-top:16px;border-left:5px solid var(--saffron);background:rgba(236,75,145,.1);border-radius:12px;padding:13px 16px;font-family:var(--font-latin);font-weight:800;font-size:clamp(20px,2.4vw,28px);line-height:1.22;color:var(--ink)}
+  .inline-quote .hl{color:var(--saffron)}
+  .map-card{min-height:158px;display:flex;flex-direction:column;justify-content:space-between}
+  .map-card .n{font-family:var(--font-mono);font-size:15px;color:var(--saffron-deep);font-weight:700}
+  .map-card h3{font-size:23px}.map-card p{font-size:15px}
+  .compare{display:grid;grid-template-columns:1fr auto 1fr;gap:13px;align-items:stretch;margin-top:20px}
+  .vs{display:flex;align-items:center;justify-content:center;font-family:var(--font-latin);font-weight:800;color:var(--saffron);font-size:28px}
+  .mock{background:#fff;border:1px solid var(--line);border-radius:13px;overflow:hidden;box-shadow:0 24px 60px -46px rgba(87,35,64,.5)}
+  .mockbar{height:32px;background:var(--ink);display:flex;align-items:center;gap:7px;padding:0 11px;color:rgba(255,255,255,.62);font-family:var(--font-mono);font-size:11px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#f06d8f}.dot.y{background:#ff9ec6}.dot.g{background:#168f84}
+  .mockbody{padding:16px}.mockbody h4{font-size:21px;margin-bottom:8px}.mockbody p{color:var(--ink-soft);line-height:1.48}
+  .tabbar{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+  .tab{font-family:var(--font-cjk);font-weight:700;font-size:14px;border:1px solid var(--line);background:var(--card2);color:var(--muted);padding:8px 15px;border-radius:30px;cursor:pointer;transition:.2s}
+  .tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tabpanel{display:none;margin-top:16px}.tabpanel.on{display:block;animation:rise .35s ease}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .stepper{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin-top:20px}
+  .pnode{min-width:0;background:var(--card);border:1px solid var(--line);border-top:4px solid var(--line);border-radius:11px;padding:11px 10px;cursor:pointer;opacity:.72;transition:.2s}
+  .pnode.on{background:var(--ink);color:#fff;opacity:1;border-top-color:var(--saffron);transform:translateY(-3px)}
+  .pnode .pi{font-family:var(--font-mono);font-size:12px;color:var(--saffron-deep)}.pnode.on .pi{color:var(--saffron)}
+  .pnode .pz{font-weight:800;font-size:14px;margin-top:3px}.pnode .pe{font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px}.pnode.on .pe{color:rgba(255,255,255,.55)}
+  .pdetail{background:var(--card2);border-radius:13px;padding:17px 19px;margin-top:12px;border-left:5px solid var(--saffron);min-height:112px}
+  .pdetail h3{font-family:var(--font-latin);margin-bottom:7px}.pdetail p{font-size:15.5px;line-height:1.5;color:var(--ink-soft);max-width:82ch}
+  input,select{width:100%;border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px 12px;font-family:var(--font-cjk);font-size:14.5px;color:var(--ink)}
+  .agent-card{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 24px 60px -48px rgba(87,35,64,.55)}
+  .agent-section{min-height:auto;padding-top:3.5vh;padding-bottom:3.5vh}
+  .agent-card .quote{font-size:clamp(28px,3.5vw,44px);max-width:none}
+  .agent-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:stretch;margin-top:22px}
+  .agent-node{border:1px solid var(--line);border-left:5px solid var(--saffron);border-radius:12px;background:linear-gradient(135deg,#fffafb,#f8e7ef);padding:14px 15px}
+  .agent-node:nth-child(3){border-left-color:var(--teal)}.agent-node:nth-child(5){border-left-color:var(--ink)}
+  .agent-node b{display:block;font-size:17px;margin-bottom:5px}.agent-node span{display:block;font-size:13px;color:var(--muted);line-height:1.35}
+  .agent-arrow{display:flex;align-items:center;color:var(--saffron);font-size:24px;font-weight:900}
+  table{width:100%;border-collapse:collapse;margin-top:18px}td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}td:first-child{font-weight:800;color:var(--ink);width:26%}td:last-child{color:var(--muted)}
+  .links{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
+  .linkcard{display:block;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+  .linkcard span{display:block;font-family:var(--font-mono);font-size:11px;color:var(--saffron-deep);margin-bottom:5px}
+  .reveal{opacity:0;transform:translateY(18px);transition:.7s ease}.reveal.in{opacity:1;transform:none}
+  @media(max-width:900px){.grid3,.grid2,.links{grid-template-columns:1fr}.dots{display:none}section{padding:34px 20px}.hero{padding-top:46px;padding-bottom:34px}.stepper{grid-template-columns:repeat(2,1fr)}.agent-flow{grid-template-columns:1fr}.agent-arrow,.vs{display:none}.compare{grid-template-columns:1fr}}
+  @media(max-width:620px){.top-home{top:12px;right:14px}.toc-mini-grid a{width:100%;justify-content:center}}
+</style>
+</head>
+<body>
+<div class="progress" id="bar"></div>
+<nav class="dots" id="dots"></nav>
+<a class="top-home" href="../ai-knowledge-home/index.html">返回主页</a>
+
+<section class="hero" id="s0">
+  <div class="wrap reveal">
+    <div class="num">Agent Reach · Frontstage Workflow</div>
+    <h1>Agent Reach Skill：<span class="hot">让 Agent 看见真实世界</span></h1>
+    <p class="sub">这节课不讲后台实现细节，而是讲一个普通用户如何把 Agent Reach 接到自己的 Agent 上：给安装链接、打开执行权限、装浏览器桥接工具、登录 X / 小红书，再让 Agent 读取真实平台内容。</p>
+    <div class="arrow-line">从“我问 AI” <span>→</span> 变成“我把现场交给 Agent 看”</div>
+    <div class="toc-mini">
+      <div class="toc-mini-title"><span>Contents</span> 本节目录</div>
+      <div class="toc-mini-grid">
+        <a href="#s1">开场</a>
+        <a href="#s2">第一性原理</a>
+        <a href="#s3">安装前台流程</a>
+        <a href="#s4">X 示例</a>
+        <a href="#s5">小红书示例</a>
+        <a href="#s6">安全边界</a>
+        <a href="#s7">课堂练习</a>
+        <a href="#s8">课后作业</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s1">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">开场</span> Agent 最大的问题不是不会写</div>
+    <h2 class="opening-title">Agent 最大的问题，是<span class="pink-line">看不见现场</span></h2>
+    <p class="lead">你让 AI 分析 X 上的讨论、小红书上的评价，或者某个账号最近的内容，如果它没有真实读取平台，只能靠常识猜。Agent Reach 要解决的第一件事，就是让 Agent 能进入外部平台，把现场信息拿回来。</p>
+    <div class="compare">
+      <div class="card"><div class="k">Without Reach</div><h3>复制链接给 AI</h3><p>AI 可能打不开，或者只能根据标题猜。你得到的是“像分析”的文字。</p></div>
+      <div class="vs">VS</div>
+      <div class="card teal"><div class="k">With Reach</div><h3>让 Agent 读取现场</h3><p>Agent 通过正确通道读取平台内容，再把结果交给 Codex 做判断。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="s2">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">第一性原理</span> 用户到底要装什么</div>
+    <h2>不是装一个工具，而是打通三层东西</h2>
+    <p class="lead">从用户视角看，Agent Reach 的安装不是为了背命令，而是给 Agent 装上“读取外部世界”的三层脚手架。</p>
+    <div class="grid3">
+      <div class="card map-card"><div class="n">01</div><h3>Agent 端</h3><p>把 Agent Reach 安装链接发给 Codex / Claude Code / OpenClaw / Cursor，让 Agent 学会这套 Skill。</p></div>
+      <div class="card teal map-card"><div class="n">02</div><h3>浏览器端</h3><p>对 X、小红书这类需要登录态的平台，需要 Chrome + OpenCLI / OpenClaw 这类浏览器桥接能力。</p></div>
+      <div class="card ink map-card"><div class="n">03</div><h3>账号端</h3><p>你要先在浏览器里登录平台。Agent 不是绕过登录，而是读取你已经能看到的公开内容。</p></div>
+    </div>
+    <p class="inline-quote">第一性原理：<span class="hl">Agent 只能分析它能读取到的现场。</span></p>
+  </div>
+</section>
+
+<section id="s3">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">前台流程</span> 用户真正要做的几步</div>
+    <h2>先安装，再连接浏览器，最后跑平台任务</h2>
+    <p class="lead">这部分才是课堂里应该讲的“操作路径”。它不是 Agent 后台的路由表，而是你作为使用者怎样一步一步把能力接起来。</p>
+    <div class="stepper" id="stepper"></div>
+    <div class="pdetail" id="pdetail"></div>
+    <div class="mock" style="margin-top:16px">
+      <div class="mockbar"><span class="dot"></span><span class="dot y"></span><span class="dot g"></span> install instruction</div>
+      <div class="mockbody">
+        <h4>可以直接丢给 Codex 的第一句话</h4>
+        <p><b>Install Agent Reach: https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md</b></p>
+        <p style="margin-top:8px">如果你用的是 OpenClaw，要先确认它允许执行 shell 命令；否则 Agent 没法安装依赖和跑 doctor。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s4">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">示例 01</span> X / Twitter 怎么跑</div>
+    <h2>X 的重点：搜索、时间线和单条推文</h2>
+    <p class="lead">X 的课程案例适合讲“公开讨论调研”：看某个工具、话题、人物或趋势在海外技术圈怎么被讨论。</p>
+    <div class="grid3">
+      <div class="card"><div class="k">准备</div><h3>先登录 X</h3><p>在 Chrome 里登录 X。若走 twitter-cli，可能需要 cookie；若走 OpenCLI，则复用浏览器登录态。</p></div>
+      <div class="card teal"><div class="k">任务</div><h3>让 Agent 读讨论</h3><p>例如：搜索 “Agent Reach”，读取 10 条相关讨论，保留链接、作者、发布时间和观点。</p></div>
+      <div class="card ink"><div class="k">输出</div><h3>不要只总结</h3><p>输出“大家在夸什么、担心什么、哪些观点值得引用、哪些只是噪声”。</p></div>
+    </div>
+    <div class="mock" style="margin-top:16px">
+      <div class="mockbar"><span class="dot"></span><span class="dot y"></span><span class="dot g"></span> example task / X</div>
+      <div class="mockbody"><p>“请用 Agent Reach 读取 X 上关于 Agent Reach 的近期讨论。先说明你使用的后端和读取范围，再给我 5 条代表观点和链接，最后总结正面评价、负面顾虑和可引用金句。”</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">示例 02</span> 小红书怎么跑</div>
+    <h2>小红书的重点：Chrome 登录态 + OpenCLI</h2>
+    <p class="lead">小红书不是“直接拿 note_id 就读”。正确方式通常是先搜索或打开 feed，拿到完整结果和 token，再读笔记、评论或用户主页公开内容。</p>
+    <div class="grid3">
+      <div class="card"><div class="k">Step 1</div><h3>用小号登录 Chrome</h3><p>小红书有风控，课堂演示建议用小号。不要用主账号做高频抓取。</p></div>
+      <div class="card teal"><div class="k">Step 2</div><h3>装浏览器桥接</h3><p>通过 OpenCLI / OpenClaw 这类工具，让 Agent 能复用你浏览器里已经登录的小红书页面。</p></div>
+      <div class="card ink"><div class="k">Step 3</div><h3>先搜索，再读取</h3><p>先搜索关键词或账号，再基于搜索结果读取笔记详情、评论和用户主页公开内容。</p></div>
+    </div>
+    <div class="mock" style="margin-top:16px">
+      <div class="mockbar"><span class="dot"></span><span class="dot y"></span><span class="dot g"></span> example task / 小红书</div>
+      <div class="mockbody"><p>“请用 Agent Reach 的小红书通道搜索【AI 学习 / Agent Reach / Codex】相关内容。先确认 active_backend，再读取 10 条代表笔记，输出标题、账号、互动数据、主要观点和可迁移选题。”</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="s6" class="agent-section">
+  <div class="wrap reveal">
+    <div class="agent-card">
+      <p class="quote">能看见真实世界，也意味着要知道<span class="hl">哪里不能乱碰</span>。</p>
+      <div class="agent-flow">
+        <div class="agent-node"><b>只读优先</b><span>课程演示只做读取、搜索、总结，不做发帖、评论、点赞。</span></div>
+        <div class="agent-arrow">→</div>
+        <div class="agent-node"><b>小号演示</b><span>涉及小红书等风控平台，用小号登录，降低账号风险。</span></div>
+        <div class="agent-arrow">→</div>
+        <div class="agent-node"><b>证据留痕</b><span>保留读取范围、来源链接、时间和限制，方便复盘。</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s7">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">课堂练习</span> 从 X 到小红书跑一次</div>
+    <h2>练习：同一个问题，两个平台怎么看</h2>
+    <p class="lead">选一个你关心的工具或话题，比如 Agent Reach、Codex、某个 AI 产品。让 Agent 分别读取 X 和小红书，比较两个平台的讨论差异。</p>
+    <div class="grid2">
+      <div class="card"><h3>X 侧问题</h3><p>技术圈怎么评价？关注点是安装、能力、可靠性、替代方案，还是安全边界？</p></div>
+      <div class="card teal"><h3>小红书侧问题</h3><p>普通用户怎么理解？他们关心的是教程、案例、好不好用，还是账号风险？</p></div>
+    </div>
+    <table>
+      <tr><td>输入</td><td>同一个主题 + 两个平台 + 读取范围。</td></tr>
+      <tr><td>过程</td><td>先确认后端，再读取内容，再保留来源。</td></tr>
+      <tr><td>输出</td><td>平台差异、代表观点、可引用素材、下一步选题。</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="s8">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">课后</span> 作业</div>
+    <h2>课后作业：完成一次前台接入</h2>
+    <p class="lead">这次作业不是写一段漂亮指令，而是把 Agent Reach 真的接起来，并用 X 或小红书跑一次只读任务。</p>
+    <table>
+      <tr><td>安装</td><td>把 Agent Reach 安装链接发给 Codex / 其他 Agent，让它完成安装和 doctor 检查。</td></tr>
+      <tr><td>浏览器</td><td>在 Chrome 中准备 OpenCLI / OpenClaw 这类浏览器桥接能力，并登录演示平台。</td></tr>
+      <tr><td>X 任务</td><td>读取一个话题的近期讨论，输出代表观点和证据链接。</td></tr>
+      <tr><td>小红书任务</td><td>用小号登录后，读取一个关键词下的代表笔记，输出可迁移选题。</td></tr>
+      <tr><td>复盘</td><td>记录哪里卡住：权限、登录态、风控、后端不可用，还是任务描述不清楚。</td></tr>
+    </table>
+    <div class="links">
+      <a class="linkcard" href="https://github.com/Panniantong/Agent-Reach" target="_blank" rel="noopener"><span>Tool</span>Agent Reach GitHub</a>
+      <a class="linkcard" href="https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md" target="_blank" rel="noopener"><span>Install</span>Agent Reach 安装说明</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  const sections=[...document.querySelectorAll('section')],bar=document.getElementById('bar'),dots=document.getElementById('dots');
+  const labels=['封面','开场','原理','安装','X','小红书','安全','练习','作业'];
+  sections.forEach((s,i)=>{const a=document.createElement('a');a.href='#'+s.id;a.title=labels[i]||'';dots.appendChild(a);});
+  const dotEls=[...dots.children];
+  function onScroll(){
+    const max=document.documentElement.scrollHeight-innerHeight;
+    bar.style.width=(scrollY/max*100)+'%';
+    let cur=0;sections.forEach((s,i)=>{if(s.getBoundingClientRect().top<innerHeight*.45)cur=i});
+    dotEls.forEach((d,i)=>d.classList.toggle('on',i===cur));
+    document.querySelectorAll('.reveal').forEach(el=>{if(el.getBoundingClientRect().top<innerHeight*.86)el.classList.add('in')});
+  }
+  addEventListener('scroll',onScroll);onScroll();
+
+  const flow=[
+    {en:'send link',zh:'甩安装链接',body:'把 Agent Reach 的 install.md 链接直接发给 Codex / Claude Code / OpenClaw / Cursor，让 Agent 自己读取安装说明并执行。'},
+    {en:'enable exec',zh:'打开执行权限',body:'如果使用 OpenClaw，先确认 tools profile 允许 exec；否则它无法 pip install、运行 doctor 或调用平台 CLI。'},
+    {en:'install + doctor',zh:'安装并体检',body:'让 Agent 安装 Agent Reach，然后运行 agent-reach doctor --json，确认哪些平台 ready，哪些需要登录态或额外配置。'},
+    {en:'browser bridge',zh:'连接 Chrome',body:'对 X、小红书、Reddit 这类平台，准备 OpenCLI / OpenClaw Browser Relay 等浏览器桥接能力，复用真实 Chrome 登录态。'},
+    {en:'login account',zh:'登录平台账号',body:'在 Chrome 里手动登录 X 或小红书。小红书建议用小号。Agent 读取的是你已经能看到的公开内容。'},
+    {en:'run read-only task',zh:'跑只读任务',body:'先让 Agent 搜索或读取代表内容，再要求它保留来源、链接、互动数据和限制说明。课堂演示只做只读任务。'}
+  ];
+  const stepper=document.getElementById('stepper'),pdetail=document.getElementById('pdetail');
+  stepper.innerHTML=flow.map((p,i)=>'<div class="pnode" data-i="'+i+'"><div class="pi">'+String(i+1).padStart(2,'0')+'</div><div class="pz">'+p.zh+'</div><div class="pe">'+p.en+'</div></div>').join('');
+  function showStep(i){
+    document.querySelectorAll('.pnode').forEach((n,j)=>n.classList.toggle('on',j<=i));
+    const p=flow[i];
+    pdetail.innerHTML='<h3>'+(i+1)+'. '+p.zh+' <span style="font-family:var(--font-mono);font-size:13px;color:var(--muted);font-weight:400">'+p.en+'</span></h3><p>'+p.body+'</p>';
+  }
+  stepper.addEventListener('click',e=>{const n=e.target.closest('.pnode');if(n)showStep(+n.dataset.i)});
+  showStep(0);
+</script>
+</body>
+</html>
