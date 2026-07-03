@@ -462,6 +462,10 @@
     border-radius:20px;
     background:linear-gradient(145deg,#fff,#fff4f7);
   }
+  .path-item.has-image{
+    grid-template-columns:34px minmax(160px,.36fr) minmax(0,1fr);
+    align-items:stretch;
+  }
   .path-item::before{
     counter-increment:path;
     content:counter(path,decimal-leading-zero);
@@ -484,6 +488,32 @@
     color:var(--ink-soft);
     font-size:14px;
     line-height:1.45;
+  }
+  .path-thumb{
+    min-height:154px;
+    border:1px solid rgba(36,22,37,.12);
+    border-radius:16px;
+    overflow:hidden;
+    background:#fff;
+  }
+  .path-thumb img{
+    width:100%;
+    height:100%;
+    min-height:154px;
+    display:block;
+    object-fit:cover;
+    object-position:left top;
+  }
+  .path-copy{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .path-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
   }
   .path-link{
     align-self:center;
@@ -599,6 +629,8 @@
     .scenario-grid,.chooser{grid-template-columns:1fr}
     .scenario-card{min-height:205px}
     .path-item{grid-template-columns:34px 1fr}
+    .path-item.has-image{grid-template-columns:34px 1fr}
+    .path-thumb{grid-column:2;min-height:132px}
     .path-link{grid-column:2;justify-self:start}
   }
 </style>
@@ -759,8 +791,19 @@
       kicker: 'Knowledge System',
       title: '知识管理',
       desc: '把个人经验和团队资料沉淀成可复用能力。重点不是把资料存起来，而是让资料、SOP 和专家判断能被 AI 调用。',
-      links: ['Obsidian', 'FastGPT', '飞书知识库'],
+      links: ['Obsidian', 'FastGPT', '飞书知识库', 'Web Clipper'],
       path: [
+        {
+          title: 'Feishu Web Clipper：一键收藏网页到飞书知识库',
+          desc: '一个从真实需求做出来的 Chrome 插件：提取网页内容，保存到飞书知识库，并可用 DeepSeek 整理成康奈尔笔记。这里放项目故事、开源代码和小红书分享。',
+          href: 'feishu-web-clipper-story/index.html',
+          image: 'feishu-web-clipper-story/images/plugin-popup-cornell.png',
+          actions: [
+            { label: '项目故事', href: 'feishu-web-clipper-story/index.html' },
+            { label: 'GitHub', href: 'https://github.com/ChenSixing123/cornell_feishu_web_clipper', external: true },
+            { label: '小红书', href: 'https://www.xiaohongshu.com/discovery/item/6a4652cf000000001101dbdb?source=webshare&xhsshare=pc_web&xsec_token=ABdfOCRV9u3vUw_WokN2mP1clooTJnPCY52PS7bKoAG00=&xsec_source=pc_share', external: true }
+          ]
+        },
         {
           title: 'WorkBuddy x Obsidian：丝滑的知识库管理体系',
           desc: '我好像发现了一个很顺手的个人知识管理组合：用 Obsidian 沉淀资料，用 WorkBuddy 把知识真正调动起来。',
@@ -802,10 +845,25 @@
       const isReady = href && href !== '#';
       const linkText = isReady ? '查看' : '待更新';
       const linkClass = isReady ? 'path-link' : 'path-link is-pending';
+      const image = Array.isArray(item) ? '' : (item.image || '');
+      const actions = Array.isArray(item) ? [] : (item.actions || []);
+      const actionMarkup = actions.length
+        ? `<div class="path-actions">${actions.map((action)=>`
+            <a class="path-link" href="${action.href}" ${action.external ? 'target="_blank" rel="noreferrer"' : ''}>${action.label}</a>
+          `).join('')}</div>`
+        : `<a class="${linkClass}" href="${href}" ${isReady ? '' : 'aria-disabled="true"'}>${linkText}</a>`;
+      if(image){
+        return `
+      <div class="path-item has-image">
+        <div class="path-thumb"><img src="${image}" alt="${title} 项目预览图"></div>
+        <div class="path-copy"><b>${title}</b><span>${desc}</span>${actionMarkup}</div>
+      </div>
+    `;
+      }
       return `
       <div class="path-item">
         <div><b>${title}</b><span>${desc}</span></div>
-        <a class="${linkClass}" href="${href}" ${isReady ? '' : 'aria-disabled="true"'}>${linkText}</a>
+        ${actionMarkup}
       </div>
     `;
     }).join('');

@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>我用 AI 做了一个飞书网页收藏插件</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --soft: #f6f8fb;
+      --blue: #246bfe;
+      --green: #159a70;
+      --red: #e35264;
+      --gold: #b7791f;
+      --cyan: #0f8ea8;
+      --paper: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background: #eef3f7;
+      line-height: 1.7;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 28px;
+      border-bottom: 1px solid rgba(23, 32, 51, 0.12);
+      background: rgba(255, 255, 255, 0.93);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 780;
+      font-size: 17px;
+    }
+
+    .mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      color: #fff;
+      background: #101828;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: #475467;
+      padding: 8px 10px;
+      border-radius: 7px;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .nav a:hover {
+      color: var(--ink);
+      background: #eef4ff;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+      gap: 34px;
+      align-items: center;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 64px 28px 34px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 7px 10px;
+      border: 1px solid #cdd9e8;
+      border-radius: 999px;
+      color: #355071;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 720;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      line-height: 1.16;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin-top: 18px;
+      font-size: clamp(34px, 6vw, 70px);
+      max-width: 920px;
+    }
+
+    .lead {
+      max-width: 780px;
+      margin: 22px 0 0;
+      color: #344054;
+      font-size: 19px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border-radius: 7px;
+      border: 1px solid #c8d4e4;
+      background: #fff;
+      text-decoration: none;
+      font-weight: 760;
+      color: var(--ink);
+    }
+
+    .button.primary {
+      border-color: var(--blue);
+      color: #fff;
+      background: var(--blue);
+    }
+
+    .button.github {
+      border-color: #24292f;
+      color: #fff;
+      background: #24292f;
+    }
+
+    .button.xhs {
+      border-color: #ff2442;
+      color: #fff;
+      background: #ff2442;
+    }
+
+    .visual {
+      border: 1px solid #d7dfeb;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 22px 50px rgba(16, 24, 40, 0.12);
+    }
+
+    .visual img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .caption {
+      padding: 12px 14px;
+      color: #667085;
+      font-size: 13px;
+      border-top: 1px solid #e4e9f2;
+      background: #fbfcfe;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px 28px 80px;
+    }
+
+    section {
+      margin-top: 26px;
+      padding: 34px;
+      border-radius: 8px;
+      border: 1px solid #dbe3ee;
+      background: var(--paper);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 22px;
+      margin-bottom: 24px;
+    }
+
+    .section-head p {
+      max-width: 720px;
+      margin: 10px 0 0;
+      color: var(--muted);
+    }
+
+    .kicker {
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin-top: 8px;
+      font-size: clamp(25px, 3vw, 42px);
+    }
+
+    h3 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card {
+      padding: 20px;
+      border: 1px solid #dce4ef;
+      border-radius: 8px;
+      background: #fbfcff;
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .card p,
+    .card li {
+      color: #4b5565;
+    }
+
+    .tag {
+      display: inline-flex;
+      margin-bottom: 12px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #344054;
+      background: #edf2f7;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      align-items: stretch;
+      counter-reset: step;
+    }
+
+    .step {
+      position: relative;
+      min-height: 126px;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #d6dfeb;
+      background: #fff;
+    }
+
+    .step::before {
+      counter-increment: step;
+      content: counter(step);
+      display: inline-grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      margin-bottom: 12px;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--blue);
+      font-size: 13px;
+      font-weight: 780;
+    }
+
+    .step strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .step span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .image-frame {
+      border: 1px solid #d8e0eb;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .image-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .note {
+      border-left: 4px solid var(--gold);
+      padding: 14px 16px;
+      background: #fff8ed;
+      color: #5f4216;
+      border-radius: 0 7px 7px 0;
+    }
+
+    .tech-map {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .node {
+      padding: 18px;
+      min-height: 126px;
+      border-radius: 8px;
+      border: 1px solid #dce4ee;
+      background: #fff;
+    }
+
+    .node b {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .node p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .arrow {
+      color: #667085;
+      font-weight: 900;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    .code-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid #dbe3ee;
+    }
+
+    .code-table th,
+    .code-table td {
+      padding: 14px;
+      border-bottom: 1px solid #e6ebf2;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .code-table th {
+      background: #f3f6fa;
+      font-size: 14px;
+    }
+
+    .code-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    code {
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: #eef2f7;
+      color: #24324a;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.92em;
+    }
+
+    pre {
+      overflow: auto;
+      padding: 18px;
+      border-radius: 8px;
+      color: #ecfdf3;
+      background: #111827;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .tab {
+      border: 1px solid #cdd7e5;
+      background: #fff;
+      color: #344054;
+      min-height: 38px;
+      padding: 0 12px;
+      border-radius: 7px;
+      font-weight: 760;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      border-color: var(--blue);
+      color: #fff;
+      background: var(--blue);
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+    }
+
+    .turn {
+      display: grid;
+      grid-template-columns: 170px minmax(0, 1fr);
+      gap: 14px;
+      padding: 18px;
+      border: 1px solid #dfe6ef;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .turn-meta {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .prompt {
+      margin: 0 0 12px;
+      color: #1f2937;
+      font-weight: 730;
+    }
+
+    .response {
+      margin: 0;
+      color: #596579;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .checklist {
+      padding-left: 20px;
+    }
+
+    .checklist li {
+      margin: 8px 0;
+    }
+
+    .footer {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 28px 56px;
+      color: #667085;
+      font-size: 14px;
+    }
+
+    @media (max-width: 920px) {
+      .hero,
+      .split,
+      .grid.two,
+      .grid.three,
+      .tech-map {
+        grid-template-columns: 1fr;
+      }
+
+      .arrow {
+        transform: rotate(90deg);
+      }
+
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .turn {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .hero,
+      main {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      section {
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="mark">F</span>Feishu Web Clipper 项目故事</div>
+    <nav class="nav" aria-label="页面导航">
+      <a href="#story">怎么做出来</a>
+      <a href="#principles">技术原理</a>
+      <a href="#files">文件地图</a>
+      <a href="#cornell">Cornell</a>
+      <a href="#conversation">完整对话</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <div>
+      <span class="eyebrow">一个非技术背景用户的 AI 编程实践</span>
+      <h1>我用 AI 做了一个飞书网页收藏插件</h1>
+      <p class="lead">这是一个从真实需求长出来的小工具：浏览网页时点一下 Chrome 插件，就能把内容保存到飞书知识库；如果选择 Cornell 模式，它还会调用 DeepSeek，把文章整理成 Summary、Cue Column 和 Notes Area。</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#story">看项目故事</a>
+        <a class="button github" href="https://github.com/ChenSixing123/cornell_feishu_web_clipper" target="_blank" rel="noreferrer">GitHub</a>
+        <a class="button xhs" href="https://www.xiaohongshu.com/discovery/item/6a4652cf000000001101dbdb?source=webshare&xhsshare=pc_web&xsec_token=ABdfOCRV9u3vUw_WokN2mP1clooTJnPCY52PS7bKoAG00=&xsec_source=pc_share" target="_blank" rel="noreferrer">小红书笔记</a>
+      </div>
+    </div>
+    <figure class="visual">
+      <img src="images/plugin-popup-cornell.png" alt="Chrome 插件弹窗截图">
+      <figcaption class="caption">你最终做出来的插件弹窗：tag、emoji、Raw / Cornell 模式和一键保存。</figcaption>
+    </figure>
+  </div>
+
+  <main>
+    <section id="story">
+      <div class="section-head">
+        <div>
+          <div class="kicker">Project Story</div>
+          <h2>这个项目到底解决了什么问题</h2>
+          <p>我平时会看到很多值得收藏的网页，但如果只是丢进收藏夹，过几天就很难再被用起来。所以我想做一个工具：把网页直接变成飞书知识库里的结构化笔记。</p>
+        </div>
+      </div>
+      <div class="flow">
+        <div class="step"><strong>网页里读内容</strong><span>Chrome 插件进入当前网页，把标题、正文、图片链接等内容整理成一包数据。</span></div>
+        <div class="step"><strong>弹窗里做选择</strong><span>你在插件弹窗选择 tag、emoji，以及 Raw 或 Cornell 模式。</span></div>
+        <div class="step"><strong>本地后端接单</strong><span>Node server 收到网页内容，负责保管密钥、调用飞书和 DeepSeek。</span></div>
+        <div class="step"><strong>飞书创建文档</strong><span>后端用你的授权创建 Docx，再移动到知识库目录。</span></div>
+        <div class="step"><strong>AI 整理笔记</strong><span>Cornell 模式会让 DeepSeek 先总结，再写入 Summary、Cue、Notes 和原文。</span></div>
+      </div>
+    </section>
+
+    <section id="share">
+      <div class="section-head">
+        <div>
+          <div class="kicker">Open Links</div>
+          <h2>想直接看成果，可以从这里开始</h2>
+          <p>这个项目既有面向普通读者的小红书分享，也有完整开源代码。如果你只是想知道“它长什么样、能做什么”，先看小红书；如果你想复刻或继续改造，可以看 GitHub。</p>
+        </div>
+      </div>
+      <div class="grid three">
+        <a class="card" href="https://www.xiaohongshu.com/discovery/item/6a4652cf000000001101dbdb?source=webshare&xhsshare=pc_web&xsec_token=ABdfOCRV9u3vUw_WokN2mP1clooTJnPCY52PS7bKoAG00=&xsec_source=pc_share" target="_blank" rel="noreferrer">
+          <span class="tag">小红书</span>
+          <strong>一键快速提取网页内容并整理入飞书知识库</strong>
+          <p>这篇笔记更适合快速了解项目效果和使用场景。</p>
+        </a>
+        <a class="card" href="https://github.com/ChenSixing123/cornell_feishu_web_clipper" target="_blank" rel="noreferrer">
+          <span class="tag">GitHub</span>
+          <strong>cornell_feishu_web_clipper</strong>
+          <p>这里放完整代码、README、截图和本地运行方式。</p>
+        </a>
+        <a class="card" href="#conversation">
+          <span class="tag">Prompt Log</span>
+          <strong>从想法到 MVP 的完整对话</strong>
+          <p>保留原始需求和精简版 AI 反馈，适合回看项目是如何一步步做出来的。</p>
+        </a>
+      </div>
+    </section>
+
+    <section id="principles">
+      <div class="section-head">
+        <div>
+          <div class="kicker">Plain Language</div>
+          <h2>用大白话解释技术原理</h2>
+          <p>你不需要先懂代码。先把整个系统想成一个小团队：浏览器插件是前台，后端是办公室，飞书是外部平台，DeepSeek 是整理笔记的帮手。</p>
+        </div>
+      </div>
+      <div class="tech-map">
+        <div class="node"><b>Chrome 插件</b><p>像一个安装在浏览器里的小遥控器。你点一下，它就知道“我要保存当前网页”。</p></div>
+        <div class="arrow">→</div>
+        <div class="node"><b>本地 Node 后端</b><p>像一个只在你电脑上运行的小办公室。它保存密钥、处理授权、调用 API。</p></div>
+        <div class="arrow">→</div>
+        <div class="node"><b>飞书 / DeepSeek</b><p>飞书负责创建文档和知识库；DeepSeek 负责把文章整理成康奈尔笔记。</p></div>
+      </div>
+      <div class="grid three" style="margin-top:18px">
+        <div class="card">
+          <span class="tag">Content Script</span>
+          <strong>网页里的“阅读员”</strong>
+          <p>它运行在网页里面，负责把页面正文拿出来。你可以把它想成一个自动复制重点内容的人。</p>
+        </div>
+        <div class="card">
+          <span class="tag">OAuth</span>
+          <strong>不是把密码给程序</strong>
+          <p>OAuth 像临时通行证。你登录飞书授权后，后端拿到 token，用 token 替你创建文档。</p>
+        </div>
+        <div class="card">
+          <span class="tag">API</span>
+          <strong>软件之间的服务窗口</strong>
+          <p>插件不会“手动点飞书按钮”。它是把请求发给飞书 API，让飞书按规则创建文档。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="setup">
+      <div class="section-head">
+        <div>
+          <div class="kicker">Feishu Setup</div>
+          <h2>飞书开发者后台发生了什么</h2>
+          <p>飞书不是随便让程序创建文档的。你需要创建一个飞书开放平台应用，告诉飞书：这个应用是谁、回调到哪里、要哪些权限、是否已经发布。</p>
+        </div>
+      </div>
+      <div class="split">
+        <div>
+          <h3>1. 应用凭证：App ID 和 App Secret</h3>
+          <p>App ID 像应用的名字，App Secret 像应用的私钥。它们只能放在后端 `.env` 里，不能放进 Chrome 插件。</p>
+          <div class="note">如果 Secret 放进插件，别人安装插件后可能把它扒出来。所以我们专门做了本地后端来保管密钥。</div>
+        </div>
+        <div class="image-frame"><img src="images/feishu-app-credentials.png" alt="飞书开放平台应用凭证截图"></div>
+      </div>
+      <div class="split" style="margin-top:24px">
+        <div>
+          <h3>2. 权限管理：告诉飞书你要做什么</h3>
+          <p>本项目主要需要创建 Docx、读取知识库、移动文档到知识库。少一个权限，就可能出现 Unauthorized 或缺 scope 的报错。</p>
+          <ul class="checklist">
+            <li><code>docx:document:create</code> 创建新版文档</li>
+            <li><code>docx:document</code> 写入和编辑文档内容</li>
+            <li><code>wiki:node:read</code> / <code>wiki:node:retrieve</code> 读取知识库节点</li>
+            <li><code>wiki:node:move</code> 把文档移动到知识库</li>
+            <li><code>offline_access</code> 让授权可以刷新，不用频繁重新登录</li>
+          </ul>
+        </div>
+        <div class="image-frame"><img src="images/feishu-permissions.png" alt="飞书开放平台权限管理截图"></div>
+      </div>
+      <div class="split" style="margin-top:24px">
+        <div>
+          <h3>3. 每次修改完都要发布</h3>
+          <p>飞书开放平台的配置不是改完马上对用户生效。你改了权限、重定向 URL、应用信息后，需要创建版本并发布。然后还要重新授权一次。</p>
+        </div>
+        <div class="image-frame"><img src="images/feishu-publish-version.png" alt="飞书开放平台版本管理与发布截图"></div>
+      </div>
+    </section>
+
+    <section id="modes">
+      <div class="section-head">
+        <div>
+          <div class="kicker">Raw vs Cornell</div>
+          <h2>为什么有两个保存模式</h2>
+          <p>Raw 和 Cornell 解决的是不同需求：一个是“先原样收藏”，一个是“收藏时顺便整理成笔记”。</p>
+        </div>
+      </div>
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-panel="raw">Raw 模式</button>
+        <button class="tab" data-panel="cornellMode">Cornell 模式</button>
+      </div>
+      <div class="panel active" id="raw">
+        <div class="split">
+          <div>
+            <h3>Raw：直接保存原文</h3>
+            <p>Raw 模式不会调用 DeepSeek，也不会生成 Summary、Cue Column 或 Notes Area。它更像“把网页正文搬进飞书”。</p>
+            <ul class="checklist">
+              <li>适合快速收藏</li>
+              <li>更省 token</li>
+              <li>保留原文上下文</li>
+            </ul>
+          </div>
+          <div class="image-frame"><img src="images/raw-output.png" alt="Raw 模式输出截图"></div>
+        </div>
+      </div>
+      <div class="panel" id="cornellMode">
+        <div class="split">
+          <div>
+            <h3>Cornell：让 AI 先帮你整理</h3>
+            <p>Cornell 模式会把正文发给 DeepSeek，让它生成 Summary、Cue Column、Notes Area 和关键词，再由后端写成飞书双栏排版。</p>
+            <ul class="checklist">
+              <li>适合学习、复盘和知识库沉淀</li>
+              <li>会消耗 DeepSeek API token</li>
+              <li>仍然会保留 Original Extract，方便核对原文</li>
+            </ul>
+          </div>
+          <div class="image-frame"><img src="images/cornell-layout-regions.png" alt="Cornell 模式输出截图"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="cornell">
+      <div class="section-head">
+        <div>
+          <div class="kicker">Cornell Notes</div>
+          <h2>康奈尔笔记法在这里怎么落地</h2>
+          <p>你要的不是“简单保存”，而是“保存时顺手变成可复习的知识”。这就是 Cornell 模式的价值。</p>
+        </div>
+      </div>
+      <div class="grid two">
+        <div class="card">
+          <h3>四个区域</h3>
+          <ul class="checklist">
+            <li><strong>Summary：</strong>文章核心价值总结。</li>
+            <li><strong>Cue Column：</strong>左侧检索线索，用短问题、关键词或概念名方便回忆。</li>
+            <li><strong>Notes Area：</strong>右侧主笔记，按“论点 -> 证据/例子 -> 启发”提炼。</li>
+            <li><strong>Original Extract：</strong>原始网页摘录，便于回看上下文。</li>
+          </ul>
+        </div>
+        <div class="image-frame"><img src="images/cornell-output.png" alt="Cornell 输出总览"></div>
+      </div>
+      <div class="note" style="margin-top:18px">Notes Area 的关键不是“压缩文章”，而是保留论证链：作者说了什么，凭什么这么说，对你有什么启发。</div>
+    </section>
+
+    <section id="files">
+      <div class="section-head">
+        <div>
+          <div class="kicker">File Map</div>
+          <h2>这个项目的文件各自负责什么</h2>
+          <p>看代码不用一上来就全读。先知道每个文件是哪个部门，就不会迷路。</p>
+        </div>
+      </div>
+      <table class="code-table">
+        <thead>
+          <tr>
+            <th>文件</th>
+            <th>大白话职责</th>
+            <th>它解决的问题</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>extension/manifest.json</code></td>
+            <td>插件身份证</td>
+            <td>告诉 Chrome：这个插件叫什么、需要哪些权限、弹窗文件在哪里。</td>
+          </tr>
+          <tr>
+            <td><code>extension/content.js</code></td>
+            <td>网页阅读员</td>
+            <td>进入当前网页，提取标题、正文、图片链接和选中文字。</td>
+          </tr>
+          <tr>
+            <td><code>extension/popup.js</code></td>
+            <td>插件控制台</td>
+            <td>处理按钮、tag、emoji、Raw / Cornell 模式、进度条和保存请求。</td>
+          </tr>
+          <tr>
+            <td><code>server/src/index.js</code></td>
+            <td>后端接待台</td>
+            <td>提供健康检查、飞书授权入口、保存网页 API。</td>
+          </tr>
+          <tr>
+            <td><code>server/src/larkClient.js</code></td>
+            <td>飞书沟通员</td>
+            <td>负责 OAuth、创建文档、写入块、移动到知识库。</td>
+          </tr>
+          <tr>
+            <td><code>server/src/summarizer.js</code></td>
+            <td>AI 笔记整理员</td>
+            <td>把网页正文发给 DeepSeek，拿回 Cornell Notes JSON。</td>
+          </tr>
+          <tr>
+            <td><code>server/src/docBlocks.js</code></td>
+            <td>飞书排版师</td>
+            <td>把普通网页内容或 Cornell Notes 转成飞书 Docx blocks。</td>
+          </tr>
+          <tr>
+            <td><code>.env</code></td>
+            <td>本地保险柜</td>
+            <td>保存 App Secret、DeepSeek Key、知识库 ID。这个文件不应该上传 GitHub。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="lessons">
+      <div class="section-head">
+        <div>
+          <div class="kicker">What You Learned</div>
+          <h2>你其实学会了很多工程思维</h2>
+          <p>虽然你说自己是小白，但这个项目已经覆盖了一条完整产品链路。</p>
+        </div>
+      </div>
+      <div class="grid three">
+        <div class="card"><strong>把大想法拆小</strong><p>“一键收藏”被拆成提取网页、授权飞书、创建文档、移动知识库、AI 整理这几步。</p></div>
+        <div class="card"><strong>知道秘密放哪里</strong><p>App Secret 和 API Key 不能放插件里，要放在本地后端 `.env`。</p></div>
+        <div class="card"><strong>会看错误信息</strong><p>Unauthorized、missing scope、redirect URL 错误，本质都是配置和权限问题。</p></div>
+        <div class="card"><strong>会做 MVP</strong><p>先让功能跑通，再逐步优化图片、进度条、链接、tag、Cornell 布局。</p></div>
+        <div class="card"><strong>会迭代产品体验</strong><p>你不只要“能用”，还在意保存进度、文档标题、emoji、知识库目录和 README。</p></div>
+        <div class="card"><strong>会发布和沉淀</strong><p>你把代码推到 GitHub，又把使用说明和截图补到 README，这已经是项目交付意识。</p></div>
+      </div>
+    </section>
+
+    <section id="conversation">
+      <div class="section-head">
+        <div>
+          <div class="kicker">Prompt Log</div>
+          <h2>你和 AI 一起把项目做出来的全过程</h2>
+          <p>下面保留你的原话；AI response 做了压缩，只记录当时给出的反馈、判断或执行结果。</p>
+        </div>
+      </div>
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-panel="phaseBuild">01 搭建与授权</button>
+        <button class="tab" data-panel="phaseImprove">02 修 bug 与体验</button>
+        <button class="tab" data-panel="phaseCornell">03 Cornell 与 README</button>
+        <button class="tab" data-panel="phaseReflect">04 复盘网站</button>
+      </div>
+
+      <div class="panel active" id="phaseBuild">
+        <div class="timeline">
+          <article class="turn"><div class="turn-meta">用户 01</div><div><p class="prompt">我有一个想法，就是想做一个谷歌插件。只要我一按这个插件按钮，它就会把网页内容转成飞书文档，然后连通到我的知识库，实现一键收藏。</p><p class="response">AI：把想法拆成 Chrome 插件、本地后端、飞书 OAuth、知识库写入这几块。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 02</div><div><p class="prompt">你开始搭建吧</p><p class="response">AI：开始创建 Manifest V3 插件、Express 后端、飞书 API client 和基础 README。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 03</div><div><p class="prompt">我加载这个谷歌浏览器的这个目录</p><p class="response">AI：指导加载 `extension` 文件夹，而不是整个项目根目录。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 04</div><div><p class="prompt">OK，我已经创好了 App ID 以及它的真实 App Secret，我应该如何填入？</p><p class="response">AI：说明填入 `.env` 的 `LARK_APP_ID` 和 `LARK_APP_SECRET`，不要写进前端插件。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 05</div><div><p class="prompt">终端我如何用快捷键打开新的一页呢？</p><p class="response">AI：解释常见终端新标签快捷键，以及也可以直接开新窗口运行 server。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 06</div><div><p class="prompt">我已经填好了 ID 和 App Secret。关于知识库方面的两个信息，我应该是获取什么样子的两个信息呢？</p><p class="response">AI：解释需要知识库 space id 和父节点 token，父节点 token 通常来自 wiki 链接。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 07</div><div><p class="prompt">https://my.feishu.cn/wiki/NMM2wL8QBi4aamkMzXhcxCPnn4e?from=from_copylink 比如说我想存到这一个目录页上面这个链接是对应的哪个呀？是那个复节点 token 第二个吗？</p><p class="response">AI：指出 URL 里的 `NMM2...` 就是可用的父节点 token。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 08</div><div><p class="prompt">OK，我现在都已经写入了 你帮我检查一下</p><p class="response">AI：检查本地配置、服务状态和关键环境变量。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 09</div><div><p class="prompt">仍然有问题啊</p><p class="response">AI：根据截图判断是 redirect URL 配置问题，指导去飞书后台安全设置添加回调地址。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 10</div><div><p class="prompt">我是需要在这里填什么吗？</p><p class="response">AI：确认需要填写 `http://localhost:8787/auth/lark/callback` 作为重定向 URL。</p></div></article>
+        </div>
+      </div>
+
+      <div class="panel" id="phaseImprove">
+        <div class="timeline">
+          <article class="turn"><div class="turn-meta">用户 11</div><div><p class="prompt">Feishu API error on /open-apis/docx/v1/documents: Unauthorized... 应用未获取所需的用户授权...</p><p class="response">AI：判断缺少 `docx:document` 和 `docx:document:create` 用户授权，需要补权限并重新授权。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 12</div><div><p class="prompt">wiki:node:write 我没有做权限里面看到这</p><p class="response">AI：说明不一定叫 `wiki:node:write`，要按实际 API 需要开 wiki 节点读取和移动相关权限。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 13</div><div><p class="prompt">这些全新够了吗</p><p class="response">AI：对照截图判断 wiki 权限大体够，但还要看 Docx 权限和重新授权。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 14</div><div><p class="prompt">不对呀，仍然是这个说明没有</p><p class="response">AI：解释权限开通后还要发布版本和重新 OAuth，旧 token 不会自动拥有新权限。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 15</div><div><p class="prompt">Feishu API error on /open-apis/docx/v1/documents/.../children?document_revision_id=1: invalid param</p><p class="response">AI：定位为写入 Docx block 参数不对，后续调整飞书 block 写入格式。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 16</div><div><p class="prompt">我发现现在存入飞书的图片是一个链接。你能不能帮我直接存一个图片，而不是一个图片链接？</p><p class="response">AI：尝试评估图片上传，但发现网页图片复杂，上传会带来稳定性和权限成本。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 17</div><div><p class="prompt">我觉得还是不行，有些图片其实是没用的。这样吧，你还是回归原来的版本。图片链接仍然保持为链接，但是必须加一小段描述图片内容的文字，你可以用括号写在图片链接后面。</p><p class="response">AI：回退图片上传，保留图片链接，并在链接后追加 alt/title/caption 描述。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 18</div><div><p class="prompt">OK，现在有一个问题，我发现提取网页的内容并不完整，这是提取的内容... 而这是原内容...</p><p class="response">AI：优化网页正文提取逻辑，尤其是微信公众号页面和更长正文的提取上限。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 19</div><div><p class="prompt">OK，现在希望你以第一性原理的原则，去重新审查这样的一个插件。看看什么地方可以优化</p><p class="response">AI：从可靠性、权限、安全、体验、内容质量几个维度重新审查插件。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 20</div><div><p class="prompt">那你觉得应该做什么样的改动？把你觉得应该要做改动的地方直接进行修改</p><p class="response">AI：直接优化提取、错误提示、链接返回、token 存储和文档结构。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 21</div><div><p class="prompt">OK，我希望在 Google 插件那个地方你再做一些优化：存储显示用百分比；Save to 飞书之后打开链接 404；Server 显示网址不好可以隐藏。</p><p class="response">AI：加了百分比进度条，修复 Feishu URL，隐藏 server 设置到 Settings 区域。</p></div></article>
+        </div>
+      </div>
+
+      <div class="panel" id="phaseCornell">
+        <div class="timeline">
+          <article class="turn"><div class="turn-meta">用户 22</div><div><p class="prompt">我不希望内容存入飞书时只是很简单地存入，能不能在飞书云文档上方加一个飞书的画板功能？比如稍微总结一下内容之类的。这个你能实现吗？是需要通过 Codex 实现，还是说你觉得这样耗费 Token 太多了？</p><p class="response">AI：解释可以做总结，但先从文本总结 MVP 开始，比直接画板更稳定。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 23</div><div><p class="prompt">我觉得能不能在谷歌插件弹出的那个窗口里加几个 tag？比如最开始先设计成红、黄、蓝、绿四个颜色，然后让用户自己去添加每个颜色代表的含义。</p><p class="response">AI：实现四个颜色 tag，支持用户自定义 label。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 24</div><div><p class="prompt">然后它保存的飞书文档里的标题 logo 也是对应的 emoji 颜色，就是一个粉色圆圈、蓝色圆圈</p><p class="response">AI：在文档标题前加入所选 tag 的 emoji。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 25</div><div><p class="prompt">我说的不是这边，我是在“飞书文档”有一个添加图标emoji 的那个地方加</p><p class="response">AI：解释飞书文档原生图标设置 API 不稳定，于是先采用标题前 emoji 方案。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 26</div><div><p class="prompt">OK，如果是这样的话，那就继续在“标题”前加 emoji 吧。然后关于 emoji，要能让用户在插件那个地方，自己设置相关的 emoji 和 tag</p><p class="response">AI：把 tag 设置扩展为 emoji + label 输入框。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 27</div><div><p class="prompt">我是说想在 Chrome 插件的那个页面可以自己修改，就是那几个 tag，你能不能弄成那种挖空可以让用户自己填的，然后再加一个“保存设置”的按钮？</p><p class="response">AI：加入可编辑 tag 表单和“保存设置”按钮，设置保存在 Chrome storage。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 28</div><div><p class="prompt">我觉得挺好，现在我再给你一个新功能的思路，你看看能不能做。你知道康奈尔笔记法吗？...</p><p class="response">AI：介绍康奈尔笔记法，并判断适合做成 Raw / Cornell 两种保存模式。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 29</div><div><p class="prompt">OK，那我输入一个 DeepSeek 的 API，你可以先试着做一个 MVP 版本。关于这个 API，你可以告诉我在哪里记，我把内容给你</p><p class="response">AI：让用户把 DeepSeek Key 写入 `.env`，不放到前端插件。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 30</div><div><p class="prompt">OK了 你检查一下是否可以连成功DeepSeek</p><p class="response">AI：测试 DeepSeek API 连接是否返回正常。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 31</div><div><p class="prompt">你再check一下</p><p class="response">AI：再次确认 DeepSeek 请求成功。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 32</div><div><p class="prompt">OK，那你现在帮我做这个 MVP 吧</p><p class="response">AI：实现 Cornell 模式，后端调用 DeepSeek 生成 Summary、Cue、Notes、tags。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 33</div><div><p class="prompt">你可以根据我调整过的这个文档排布布局，能不能都做成这个样式的？如果选的是康奈尔笔记法的话。同时你需要做的就是Notes Area，你是怎么提炼总结的？</p><p class="response">AI：读取你的飞书样本文档，复刻 Summary callout + Cue/Notes 双栏，并把 Notes Area 改成“论点｜证据/例子｜启发”。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 34</div><div><p class="prompt">OK，那我现在可以重新登录这个插件吗？</p><p class="response">AI：确认后端运行，给出重新授权链接。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 35</div><div><p class="prompt">我需要再跑一个 server 吗？</p><p class="response">AI：检查 `localhost:8787/health`，确认 server 已经在跑，不需要再开一个。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 36</div><div><p class="prompt">你可以把我这一段推到我的 GitHub 上吗？可以新建一个仓库</p><p class="response">AI：初始化本地 git，确认不提交密钥，指导创建 GitHub 仓库并推送。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 37</div><div><p class="prompt">不对，我是登录ChenSixing123 账号</p><p class="response">AI：把本地 commit 作者改为 ChenSixing123。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 38</div><div><p class="prompt">ChenSixing123/cornell_feishu_web_clipper</p><p class="response">AI：把本地仓库 remote 指向该 GitHub 仓库，合并远程 README 后推送成功。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 39</div><div><p class="prompt">能不能在 README 再详细写一下，如果别人要用我这个应该怎么做？是如何下载，还是直接把这个仓库的文件存下来？</p><p class="response">AI：重写 README，补充 clone、Download ZIP、飞书配置、DeepSeek、Chrome 加载和常见问题。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 40</div><div><p class="prompt">加一些图片到readme中，放到对应位置</p><p class="response">AI：把插件弹窗、Cornell 输出、Raw 输出、Original Extract 等截图加入 README。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 41</div><div><p class="prompt">Raw模式应该是这个图！前面上一轮对话中我截给你的那3个图都是 康奈尔 模式的！</p><p class="response">AI：纠正 README 中 Raw 示例图，替换为真正 Raw 输出截图。</p></div></article>
+          <article class="turn"><div class="turn-meta">用户 42</div><div><p class="prompt">这4张图分别对应下面4点：补充飞书开发者后台截图；补充权限管理截图；每次修改完都需要发布；Cornell 模式说明下加图。</p><p class="response">AI：按四个指定位置插入飞书后台、权限、发布、Cornell 区域截图，并推送 GitHub。</p></div></article>
+        </div>
+      </div>
+
+      <div class="panel" id="phaseReflect">
+        <div class="timeline">
+          <article class="turn"><div class="turn-meta">用户 43</div><div><p class="prompt">其实我是一个不懂代码的小白，但在做这个插件的过程中，我觉得很有成就感，也学到了很多。你能不能给我生成一个 HTML 网站，教教我中间的一些技术原理是什么样的？请用大白话跟我说说，我这一个项目到底是怎么做出来的。然后再附上一个我跟你的所有对话的 prompt。我输入的东西你可以用原话，你的 feedback（也就是 AI response）可以精简一下。我想要一个我跟你对话的全过程。</p><p class="response">AI：生成本页面，把技术原理、项目结构、学习收获和完整对话时间线整理成一个可打开的 HTML 网站。</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="next">
+      <div class="section-head">
+        <div>
+          <div class="kicker">Next Step</div>
+          <h2>如果继续往下做，可以怎么升级</h2>
+          <p>这个项目已经是一个可用 MVP。下一步可以从“个人工具”进化成“更可靠的产品”。</p>
+        </div>
+      </div>
+      <div class="grid three">
+        <div class="card"><strong>更稳定的网页提取</strong><p>接入 Mozilla Readability 或专门适配更多网站，让正文提取更完整。</p></div>
+        <div class="card"><strong>更多笔记模板</strong><p>除了 Cornell，还可以加入“商业案例拆解”“产品分析”“读书笔记”等模板。</p></div>
+        <div class="card"><strong>部署到云端</strong><p>把本地 server 迁移到云端，但要重新设计密钥、token 和用户隔离。</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>这个页面由项目本身沉淀而来。它记录的不只是代码，也记录了一个想法被一步步问清楚、做出来、修好、发布、写成说明文档的过程。</p>
+  </footer>
+
+  <script>
+    const tabs = document.querySelectorAll(".tab");
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const target = tab.dataset.panel;
+        const group = tab.closest("section");
+        group.querySelectorAll(".tab").forEach((item) => item.classList.toggle("active", item === tab));
+        group.querySelectorAll(".panel").forEach((panel) => panel.classList.toggle("active", panel.id === target));
+      });
+    });
+  </script>
+</body>
+</html>
