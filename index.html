@@ -369,7 +369,7 @@
     align-items:end;
     justify-content:space-between;
     gap:24px;
-    margin-bottom:22px;
+    margin-bottom:12px;
   }
   .section-head p{
     color:var(--ink-soft);
@@ -379,7 +379,7 @@
   }
   .scenario-grid{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:repeat(3,1fr);
     gap:16px;
   }
   .scenario-card{
@@ -393,7 +393,6 @@
     flex-direction:column;
     justify-content:space-between;
     transition:transform .22s ease,box-shadow .22s ease,background .22s ease;
-    cursor:pointer;
     box-shadow:8px 8px 0 rgba(191,108,22,.07), inset 0 1px 0 rgba(255,255,255,.7);
   }
   .scenario-card:nth-child(odd){transform:rotate(-.7deg)}
@@ -411,32 +410,52 @@
   .scenario-card:nth-child(3){border-top-color:var(--teal)}
   .scenario-card:nth-child(4){border-top-color:var(--blue)}
   .project-grid{
-    display:grid;
-    grid-template-columns:minmax(0,1fr);
-    gap:18px;
+    display:flex;
+    gap:24px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    padding:14px 4px 22px;
+    perspective:1200px;
+  }
+  .project-grid::-webkit-scrollbar{height:8px}
+  .project-grid::-webkit-scrollbar-track{background:rgba(236,75,145,.08);border-radius:999px}
+  .project-grid::-webkit-scrollbar-thumb{background:rgba(236,75,145,.34);border-radius:999px}
+  .project-grid::after{
+    content:"";
+    flex:0 0 1px;
   }
   .project-card{
-    display:grid;
-    grid-template-columns:minmax(280px,.92fr) minmax(0,1fr);
-    gap:22px;
-    align-items:stretch;
-    padding:18px;
+    flex:0 0 min(74vw,420px);
+    scroll-snap-align:center;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    padding:14px;
     border:2px solid rgba(121,70,82,.14);
-    border-radius:30px;
+    border-radius:28px;
     background:linear-gradient(145deg,#fffaf4,#ffeaf2);
     box-shadow:12px 12px 0 rgba(236,75,145,.11), inset 0 1px 0 rgba(255,255,255,.7);
+    transform:rotateY(-6deg) rotateZ(-.8deg);
+    transition:transform .28s ease, box-shadow .28s ease;
+  }
+  .project-card:nth-child(even){
+    transform:rotateY(6deg) rotateZ(.8deg);
+  }
+  .project-card:hover{
+    transform:translateY(-8px) rotateY(0deg) rotateZ(0deg);
+    box-shadow:16px 16px 0 rgba(236,75,145,.16),0 28px 70px -54px rgba(36,22,37,.6);
   }
   .project-shot{
-    min-height:280px;
+    height:230px;
     border:1px solid rgba(36,22,37,.12);
-    border-radius:22px;
+    border-radius:20px;
     overflow:hidden;
     background:#fff;
+    display:block;
   }
   .project-shot img{
     width:100%;
     height:100%;
-    min-height:280px;
     display:block;
     object-fit:cover;
     object-position:left top;
@@ -444,26 +463,26 @@
   .project-copy{
     display:flex;
     flex-direction:column;
-    justify-content:center;
-    padding:8px 4px;
+    justify-content:flex-start;
+    padding:2px 2px 0;
   }
   .project-copy h3{
     font-family:var(--font-display);
-    font-size:clamp(34px,4vw,54px);
+    font-size:clamp(30px,3.2vw,42px);
     line-height:1.02;
-    margin-bottom:14px;
+    margin-bottom:10px;
   }
   .project-copy p{
     color:var(--ink-soft);
-    line-height:1.68;
-    font-size:17px;
-    max-width:620px;
+    line-height:1.58;
+    font-size:15px;
+    max-width:36em;
   }
   .project-actions{
     display:flex;
     flex-wrap:wrap;
     gap:10px;
-    margin-top:18px;
+    margin-top:14px;
   }
   .card-num{
     font-family:var(--font-cjk);
@@ -492,17 +511,33 @@
     padding:5px 8px;
     background:rgba(255,255,255,.64);
   }
+  .path-link{
+    align-self:center;
+    border:1px solid rgba(236,75,145,.24);
+    color:var(--pink-deep);
+    background:#fff;
+    border-radius:999px;
+    padding:7px 10px;
+    font-size:12px;
+    font-weight:900;
+    white-space:nowrap;
+  }
+  .path-link.is-pending{
+    color:rgba(86,63,78,.58);
+    border-color:rgba(86,63,78,.16);
+    background:rgba(255,255,255,.55);
+    cursor:not-allowed;
+    pointer-events:none;
+  }
   .scenario-detail{
     margin-top:18px;
-    display:block;
   }
   .path-panel{
-    background:var(--paper-soft);
-    border:2px solid rgba(121,70,82,.14);
-    border-radius:30px;
-    padding:20px;
+    background:rgba(255,250,241,.72);
+    border:2px solid rgba(121,70,82,.12);
+    border-radius:28px;
+    padding:16px;
   }
-  .path-panel h3{margin-bottom:8px}
   .path-list{
     display:grid;
     gap:10px;
@@ -512,14 +547,10 @@
     display:grid;
     grid-template-columns:34px 1fr auto;
     gap:12px;
-    align-items:start;
+    align-items:center;
     padding:13px;
-    border-radius:20px;
+    border-radius:18px;
     background:linear-gradient(145deg,#fff,#fff4f7);
-  }
-  .path-item.has-image{
-    grid-template-columns:34px minmax(160px,.36fr) minmax(0,1fr);
-    align-items:stretch;
   }
   .path-item::before{
     counter-increment:path;
@@ -543,50 +574,6 @@
     color:var(--ink-soft);
     font-size:14px;
     line-height:1.45;
-  }
-  .path-thumb{
-    min-height:154px;
-    border:1px solid rgba(36,22,37,.12);
-    border-radius:16px;
-    overflow:hidden;
-    background:#fff;
-  }
-  .path-thumb img{
-    width:100%;
-    height:100%;
-    min-height:154px;
-    display:block;
-    object-fit:cover;
-    object-position:left top;
-  }
-  .path-copy{
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-  }
-  .path-actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    margin-top:12px;
-  }
-  .path-link{
-    align-self:center;
-    border:1px solid rgba(236,75,145,.24);
-    color:var(--pink-deep);
-    background:#fff;
-    border-radius:999px;
-    padding:7px 10px;
-    font-size:12px;
-    font-weight:900;
-    white-space:nowrap;
-  }
-  .path-link.is-pending{
-    color:rgba(86,63,78,.58);
-    border-color:rgba(86,63,78,.16);
-    background:rgba(255,255,255,.55);
-    cursor:not-allowed;
-    pointer-events:none;
   }
   .method{
     display:grid;
@@ -666,8 +653,8 @@
     .hero-grid{grid-template-columns:minmax(0,1fr) minmax(220px,.32fr);gap:24px}
     h1{font-size:clamp(48px,7vw,82px)}
     .profile-card{width:min(100%,260px)}
-    .project-card{grid-template-columns:1fr}
-    .scenario-grid{grid-template-columns:repeat(2,1fr)}
+    .project-card{flex-basis:min(78vw,400px)}
+    .scenario-grid{grid-template-columns:repeat(3,1fr)}
     .method{grid-template-columns:1fr;gap:10px}
     .arrow{display:none}
   }
@@ -684,11 +671,9 @@
     .section-head p{margin-top:10px}
     .scenario-grid,.chooser{grid-template-columns:1fr}
     .project-card{padding:14px;border-radius:24px}
-    .project-shot,.project-shot img{min-height:210px}
+    .project-shot{height:210px}
     .scenario-card{min-height:205px}
     .path-item{grid-template-columns:34px 1fr}
-    .path-item.has-image{grid-template-columns:34px 1fr}
-    .path-thumb{grid-column:2;min-height:132px}
     .path-link{grid-column:2;justify-self:start}
   }
 </style>
@@ -716,8 +701,7 @@
         <div class="hero-title-row">
           <h1><span class="title-name">Sandy's</span> <span class="title-ai">AI</span> <span class="title-journal">Journal</span></h1>
         </div>
-        <p class="lead">Hello 大家，欢迎来到我的 AI 学习 Online 手账本。我一直在探索 AI 如何进入真实的商业场景当中，自己平时没事就琢磨着做一些有意思的 AI 小工具。</p>
-        <p class="lead" style="font-size:clamp(16px,1.55vw,20px);margin-top:14px">Project 是我真的动手做出来的小工具；Workshop 是我整理出来的 AI 实践教程。一个偏作品，一个偏分享，慢慢都会放在这里。</p>
+        <p class="lead">Hi 我是 Sandy！<br>用 AI 做一点真实工作里的小工具。<br>记录项目、方法和灵感。</p>
       </div>
       <aside class="hero-side reveal" aria-label="Sandy 无眼镜毛毡小人形象">
         <div class="profile-card">
@@ -738,7 +722,6 @@
           <div class="eyebrow">AI Project Gallery</div>
           <h2>Project</h2>
         </div>
-        <p>这里放我真正做出来的 AI 小工具和实验项目。它们不只是教程，而是从一个真实需求开始，一步步被搭出来、修出来、发布出来的作品。</p>
       </div>
       <div class="project-grid">
         <article class="project-card reveal">
@@ -757,6 +740,21 @@
             </div>
           </div>
         </article>
+        <article class="project-card reveal">
+          <a class="project-shot" href="viewfinder-story/index.html" aria-label="查看 ViewFinder 项目故事">
+            <img src="viewfinder-story/images/project-cover.png" alt="ViewFinder 固定比例取景框截图插件项目预览">
+          </a>
+          <div class="project-copy">
+            <div class="card-num">02 / Chrome Extension · Screenshot · Xiaohongshu</div>
+            <h3>ViewFinder</h3>
+            <p>一个为飞书文档截图场景做的 Chrome 插件。它把 3:4、1:1、4:3 的取景框固定在网页上，底下内容可以继续滚动和缩放，适合把长文档稳定截成小红书图片。</p>
+            <div class="tags"><span>Chrome 插件</span><span>固定比例截图</span><span>飞书文档</span><span>小红书</span></div>
+            <div class="project-actions">
+              <a class="path-link" href="viewfinder-story/index.html">项目故事</a>
+              <a class="path-link" href="viewfinder-story/viewfinder-extension.zip">插件 ZIP</a>
+            </div>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -768,22 +766,21 @@
           <div class="eyebrow">AI Knowledge Sharing</div>
           <h2>Workshop</h2>
         </div>
-        <p>我主要把 AI 知识分享放在四类真实需求里：基础办公、内容运营、知识管理和数据分析。每一类都来自业务同学日常会遇到的具体问题。</p>
       </div>
       <div class="scenario-grid">
         <a class="scenario-card reveal active" href="#scenario-detail" data-scenario="office">
           <div>
             <div class="card-num">01 / Office</div>
             <h3>基础办公</h3>
-            <p>用 AI 提升日常办公交付效率，把汇报、文档、会议和资料整理做得更快、更清楚。</p>
+            <p>把汇报、文档协作和专业 SOP 做成更顺手的 AI 办公流。</p>
           </div>
-          <div class="tags"><span>HTML 汇报</span><span>飞书</span><span>AI 转录工具推荐</span><span>Skill 技能包</span></div>
+          <div class="tags"><span>HTML 汇报</span><span>飞书</span><span>Skill 技能包</span></div>
         </a>
         <a class="scenario-card reveal" href="#scenario-detail" data-scenario="content">
           <div>
             <div class="card-num">02 / Content</div>
             <h3>内容运营</h3>
-            <p>把内容运营从“靠灵感”变成“有流程”，让诊断、选题、脚本和复盘可以稳定迭代。</p>
+            <p>把选题、脚本、素材和复盘沉淀成可以复用的内容工作流。</p>
           </div>
           <div class="tags"><span>多维表格</span><span>Agent Reach</span><span>Sandy Writer skill</span></div>
         </a>
@@ -791,22 +788,13 @@
           <div>
             <div class="card-num">03 / Knowledge</div>
             <h3>知识管理</h3>
-            <p>把个人经验和团队资料沉淀成可复用能力，让知识不只被保存，还能被调用。</p>
+            <p>把资料、经验和知识库连接起来，让 AI 能真正调用。</p>
           </div>
           <div class="tags"><span>Obsidian</span><span>FastGPT</span><span>飞书知识库</span></div>
-        </a>
-        <a class="scenario-card reveal" href="#scenario-detail" data-scenario="data">
-          <div>
-            <div class="card-num">04 / Data</div>
-            <h3>数据分析</h3>
-            <p>把重复的数据处理变成标准化分析工具，从清洗、回填到看板和预警。</p>
-          </div>
-          <div class="tags"><span>表格清洗</span><span>洞察挖掘</span><span>分析 Skill</span><span>轻量 BI</span></div>
         </a>
       </div>
       <div class="scenario-detail reveal" id="scenario-detail" aria-live="polite">
         <div class="path-panel">
-          <h3>推荐学习路径</h3>
           <div class="path-list" id="pathList"></div>
         </div>
       </div>
@@ -824,125 +812,71 @@
 
 <script>
   const scenarioData = {
-    office: {
-      kicker: 'Office Workflow',
-      title: '基础办公',
-      desc: '这里放我整理过的基础办公类教程：从 HTML 汇报、飞书协同、AI 转录工具推荐，到 Skill 技能包，适合先把 AI 用进日常工作流。',
-      links: ['HTML 汇报', '飞书', 'AI 转录工具推荐', 'Skill 技能包'],
-      path: [
-        {
-          title: 'HTML：AI时代翻红的PPT',
-          desc: '把业务内容做成漂亮、可交互、可持续修改的网页式汇报。',
-          href: 'c1-html-course-site/index.html'
-        },
-        {
-          title: 'Codex + 飞书 CLI 怎么打通',
-          desc: '让 Codex 进入真实办公平台，读取、整理和生成飞书文档。',
-          href: 'c1-feishu-codex-course-site/index.html'
-        },
-        {
-          title: '我推荐的 AI 转录工具',
-          desc: '适合会议、访谈、课程记录的转录和总结工具清单。',
-          href: '#'
-        },
-        {
-          title: 'Skill 技能包：沉淀你的专业SOP',
-          desc: '把你反复使用的专业流程、判断标准和输出模板沉淀成可复用的 AI 技能包。',
-          href: 'c2-skill-course-site/index.html'
-        }
-      ]
-    },
-    content: {
-      kicker: 'Content Operation',
-      title: '内容运营',
-      desc: '把内容运营从“靠灵感”变成“有流程”。AI 不只是帮你写文案，更重要的是帮你完成诊断、选题、脚本、素材和复盘的完整链路。',
-      links: ['多维表格', 'Agent Reach', 'Sandy Writer skill'],
-      path: [
-        {
-          title: '我最爱的 AI 工具：飞书多维表格',
-          desc: '分享一个我用得最多的 AI Native 工具。它把 workflow 做得很丝滑：一列一节点，一行一工作流，像是自然长在办公平台里。',
-          href: '#'
-        },
-        {
-          title: 'Agent Reach Skill：让 Agent 看见真实世界',
-          desc: '从安装链接、Chrome 桥接到 X / 小红书只读任务，跑通 Agent 读取真实平台内容的前台流程。',
-          href: 'c3-agent-reach-skill-site/index.html'
-        },
-        {
-          title: 'sandy-writer-skill：蒸馏“我自己”',
-          desc: '分享我是如何用 AI 沉淀自己的写作风格 Skill，用它辅助自媒体写作，并显著提升内容生产效率。',
-          href: '#'
-        }
-      ]
-    },
-    knowledge: {
-      kicker: 'Knowledge System',
-      title: '知识管理',
-      desc: '把个人经验和团队资料沉淀成可复用能力。重点不是把资料存起来，而是让资料、SOP 和专家判断能被 AI 调用。',
-      links: ['Obsidian', 'FastGPT', '飞书知识库'],
-      path: [
-        {
-          title: 'WorkBuddy x Obsidian：丝滑的知识库管理体系',
-          desc: '我好像发现了一个很顺手的个人知识管理组合：用 Obsidian 沉淀资料，用 WorkBuddy 把知识真正调动起来。',
-          href: '#'
-        },
-        {
-          title: 'Codex + Lark CLI：我最常用的知识管理方法',
-          desc: '让 Codex 接入飞书知识库和文档，把搜索、整理、改写、输出都放进真实办公环境里完成。',
-          href: '#'
-        },
-        {
-          title: 'FastGPT：如何做一个带着知识库的客服机器人',
-          desc: '用知识库作为底座，搭建一个可以回答业务问题、复用资料内容的轻量客服机器人。',
-          href: '#'
-        }
-      ]
-    },
-    data: {
-      kicker: 'Data Workflow',
-      title: '数据分析',
-      desc: '把重复的数据处理变成标准化分析工具。业务同学不用每次下载、清洗、透视和复制结论，而是让 AI 帮你形成稳定分析入口。',
-      links: ['表格清洗', '洞察挖掘', '分析 Skill', '监控看板'],
-      path: [
-        ['先识别重复分析流程', '找到那些经常下载、整理、筛选、对比的数据任务。'],
-        ['再标准化字段和口径', '把清洗规则、分析逻辑和异常判断沉淀成 Skill。'],
-        ['最后做成看板或工具', '把分析结果做成可查询、可预警、可复用的业务界面。']
-      ]
-    }
+    office: [
+      {
+        title: 'HTML：AI 时代翻红的 PPT',
+        desc: '把业务内容做成漂亮、可交互、可持续修改的网页式汇报。',
+        href: 'c1-html-course-site/index.html'
+      },
+      {
+        title: 'Codex + 飞书 CLI 怎么打通',
+        desc: '让 Codex 进入真实办公平台，读取、整理和生成飞书文档。',
+        href: 'c1-feishu-codex-course-site/index.html'
+      },
+      {
+        title: 'Skill 技能包：沉淀你的专业 SOP',
+        desc: '把反复使用的专业流程、判断标准和输出模板沉淀成可复用的 AI 技能包。',
+        href: 'c2-skill-course-site/index.html'
+      }
+    ],
+    content: [
+      {
+        title: '我最爱的 AI 工具：飞书多维表格',
+        desc: '一列一节点，一行一工作流，把内容运营流程放进表格里跑。',
+        href: '#'
+      },
+      {
+        title: 'Agent Reach Skill：让 Agent 看见真实世界',
+        desc: '跑通 Agent 读取 X / 小红书等真实平台内容的前台流程。',
+        href: 'c3-agent-reach-skill-site/index.html'
+      },
+      {
+        title: 'sandy-writer-skill：蒸馏“我自己”',
+        desc: '把自己的写作风格沉淀成 Skill，用来辅助自媒体写作。',
+        href: '#'
+      }
+    ],
+    knowledge: [
+      {
+        title: 'WorkBuddy x Obsidian：丝滑的知识库管理体系',
+        desc: '用 Obsidian 沉淀资料，用 WorkBuddy 把知识真正调动起来。',
+        href: 'workbuddy-obsidian-course-site/index.html'
+      },
+      {
+        title: 'Codex + Lark CLI：我最常用的知识管理方法',
+        desc: '让 Codex 接入飞书知识库和文档，把搜索、整理和输出放进真实办公环境。',
+        href: '#'
+      },
+      {
+        title: 'FastGPT：如何做一个带着知识库的客服机器人',
+        desc: '用知识库作为底座，搭建一个可以复用资料内容的轻量客服机器人。',
+        href: '#'
+      }
+    ]
   };
 
   const pathList = document.getElementById('pathList');
 
   function renderScenario(key){
-    const data = scenarioData[key] || scenarioData.office;
-    pathList.innerHTML = data.path.map((item)=>{
-      const title = Array.isArray(item) ? item[0] : item.title;
-      const desc = Array.isArray(item) ? item[1] : item.desc;
-      const href = Array.isArray(item) ? '#' : (item.href || '#');
-      const isReady = href && href !== '#';
-      const linkText = isReady ? '查看' : '待更新';
-      const linkClass = isReady ? 'path-link' : 'path-link is-pending';
-      const image = Array.isArray(item) ? '' : (item.image || '');
-      const actions = Array.isArray(item) ? [] : (item.actions || []);
-      const actionMarkup = actions.length
-        ? `<div class="path-actions">${actions.map((action)=>`
-            <a class="path-link" href="${action.href}" ${action.external ? 'target="_blank" rel="noreferrer"' : ''}>${action.label}</a>
-          `).join('')}</div>`
-        : `<a class="${linkClass}" href="${href}" ${isReady ? '' : 'aria-disabled="true"'}>${linkText}</a>`;
-      if(image){
-        return `
-      <div class="path-item has-image">
-        <div class="path-thumb"><img src="${image}" alt="${title} 项目预览图"></div>
-        <div class="path-copy"><b>${title}</b><span>${desc}</span>${actionMarkup}</div>
-      </div>
-    `;
-      }
+    const items = scenarioData[key] || scenarioData.office;
+    pathList.innerHTML = items.map((item)=> {
+      const isReady = item.href && item.href !== '#';
       return `
-      <div class="path-item">
-        <div><b>${title}</b><span>${desc}</span></div>
-        ${actionMarkup}
-      </div>
-    `;
+        <div class="path-item">
+          <div><b>${item.title}</b><span>${item.desc}</span></div>
+          <a class="path-link${isReady ? '' : ' is-pending'}" href="${item.href}" ${isReady ? '' : 'aria-disabled="true"'}>${isReady ? '查看' : '待更新'}</a>
+        </div>
+      `;
     }).join('');
   }
 

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>WorkBuddy x Obsidian：丝滑的知识库管理体系</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,700..900,70,1&family=Noto+Sans+SC:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fff3f7;--paper2:#fffaf1;--card:#ffe7f0;--card2:#fffafb;--ink:#241625;--ink-soft:#5d3b52;
+    --muted:#9d7588;--line:rgba(36,22,37,.16);--pink:#ec4b91;--pink-deep:#9d1d61;
+    --saffron:#f2a83b;--saffron-deep:#bf6c16;--teal:#168f82;--blue:#5f64d9;--lemon:#fff06a;
+    --font-cjk:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+    --font-display:"Fraunces",var(--font-cjk);--font-mono:"Space Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    min-height:100vh;background:var(--paper);color:var(--ink);font-family:var(--font-cjk);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+    background:
+      radial-gradient(circle at 18% 20%,rgba(255,255,255,.58) 0 1px,transparent 2px),
+      radial-gradient(circle at 78% 18%,rgba(236,75,145,.10) 0 2px,transparent 3px),
+      linear-gradient(90deg,rgba(236,75,145,.075) 1px,transparent 1px),
+      linear-gradient(0deg,rgba(36,22,37,.045) 1px,transparent 1px);
+    background-size:18px 18px,26px 26px,42px 42px,42px 42px;
+    mask-image:linear-gradient(to bottom,rgba(0,0,0,.92),rgba(0,0,0,.22));
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.14;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='felt'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23felt)' opacity='.5'/%3E%3C/svg%3E");
+  }
+  a{color:inherit;text-decoration:none}
+  .progress{position:fixed;top:0;left:0;width:0;height:4px;background:var(--pink);z-index:70}
+  .top-home{
+    position:fixed;top:18px;right:22px;z-index:60;display:inline-flex;align-items:center;min-height:38px;
+    padding:0 15px;border-radius:999px;background:var(--ink);color:#fff;font-weight:900;font-size:14px;
+    box-shadow:0 16px 38px -28px rgba(36,21,38,.65);
+  }
+  section{padding:42px 7vw;border-bottom:1px solid rgba(36,22,37,.09)}
+  .wrap{width:min(1120px,100%);margin:0 auto}
+  .hero{padding-top:70px;padding-bottom:46px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;color:var(--saffron-deep);letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px}
+  .tag{display:inline-flex;align-items:center;border:1px solid rgba(236,75,145,.28);border-radius:999px;background:rgba(255,255,255,.56);color:var(--pink-deep);padding:6px 11px;font-size:13px;font-weight:800}
+  h1,h2{font-family:var(--font-display);font-weight:900;letter-spacing:0;color:var(--ink)}
+  h1{font-size:clamp(48px,7vw,92px);line-height:.95;max-width:12ch;text-shadow:5px 6px 0 rgba(236,75,145,.10)}
+  h1 .hot{color:var(--pink);font-style:italic;position:relative;display:inline-block}
+  h1 .hot::after{content:"";position:absolute;left:.04em;right:.02em;bottom:.06em;height:.16em;z-index:-1;border-radius:999px;background:rgba(255,240,106,.78)}
+  h1 small{display:block;margin-top:12px;font-family:var(--font-cjk);font-size:clamp(28px,3.8vw,50px);line-height:1.1;color:var(--ink);text-shadow:none}
+  h2{font-size:clamp(36px,5vw,66px);line-height:1.05;margin-bottom:14px}
+  h3{font-size:22px;line-height:1.25}
+  .lead{font-size:clamp(18px,2vw,24px);line-height:1.58;color:var(--ink-soft);max-width:820px;margin-top:16px}
+  .lead strong{color:var(--ink)}
+  .arrow-line{display:flex;align-items:center;gap:10px;margin-top:24px;font-family:var(--font-display);font-weight:900;font-size:clamp(24px,3vw,38px)}
+  .arrow-line span{color:var(--pink)}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+  .card{background:rgba(255,250,251,.88);border:1px solid var(--line);border-left:5px solid var(--pink);border-radius:16px;padding:18px 20px;box-shadow:0 20px 45px -38px rgba(87,35,64,.42)}
+  .card.teal{border-left-color:var(--teal)}.card.gold{border-left-color:var(--saffron)}.card.blue{border-left-color:var(--blue)}
+  .k{font-family:var(--font-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px}
+  .card p{font-size:15.5px;color:var(--ink-soft);line-height:1.55;margin-top:8px}
+  .card b{color:var(--ink)}
+  .compare{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:stretch;margin-top:22px}
+  .vs{display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:34px;font-weight:900;color:var(--pink)}
+  .bridge{margin-top:18px;background:var(--ink);color:#fff;border-radius:18px;padding:18px 20px;display:flex;gap:14px;align-items:flex-start}
+  .bridge b{color:var(--lemon)}
+  .bridge p{line-height:1.55;color:rgba(255,255,255,.82)}
+  .simple-stack{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:22px}
+  .principle{background:#fff;border:1px solid var(--line);border-top:5px solid var(--pink);border-radius:16px;padding:15px 14px;box-shadow:0 18px 42px -38px rgba(87,35,64,.42)}
+  .principle:nth-child(2){border-top-color:var(--saffron)}
+  .principle:nth-child(3){border-top-color:var(--teal)}
+  .principle:nth-child(4){border-top-color:var(--blue)}
+  .principle:nth-child(5){border-top-color:var(--ink)}
+  .principle b{display:block;margin:0 0 6px;font-size:18px}
+  .principle p{font-size:14.5px;color:var(--ink-soft);line-height:1.45}
+  .workflow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px;align-items:stretch}
+  .flow-step{position:relative;border:1px solid var(--line);background:linear-gradient(145deg,#fff,#fff7fb);border-radius:15px;padding:15px}
+  .flow-step::after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--pink);font-weight:900}
+  .flow-step:last-child::after{display:none}
+  .flow-step span{font-family:var(--font-mono);font-size:11px;color:var(--pink-deep);font-weight:800}
+  .flow-step b{display:block;margin:5px 0 6px}
+  .flow-step p{font-size:14px;color:var(--ink-soft);line-height:1.45}
+  .takeaway{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+  .quote{font-family:var(--font-display);font-size:clamp(30px,4.6vw,62px);line-height:1.12;font-weight:900}
+  .quote .hot{color:var(--pink)}
+  .checklist{display:grid;gap:10px;margin-top:18px}
+  .check{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px 14px}
+  .check i{font-style:normal;color:var(--pink);font-weight:900}
+  .check p{color:var(--ink-soft);line-height:1.48}
+  .reveal{opacity:0;transform:translateY(18px);transition:.7s ease}.reveal.in{opacity:1;transform:none}
+  @media(max-width:900px){
+    .grid3,.grid2,.compare,.workflow,.takeaway,.simple-stack{grid-template-columns:1fr}
+    .vs,.flow-step::after{display:none}
+    section{padding:36px 20px}.hero{padding-top:62px}
+    h1{max-width:10ch}
+  }
+  @media(max-width:560px){
+    .top-home{top:12px;right:14px}
+  }
+</style>
+</head>
+<body>
+<div class="progress" id="bar"></div>
+<a class="top-home" href="../index.html">返回主页</a>
+
+<section class="hero" id="s0">
+  <div class="wrap reveal">
+    <div class="eyebrow">Knowledge Workflow</div>
+    <h1>WorkBuddy x <span class="hot">Obsidian</span><small>丝滑的知识库管理体系</small></h1>
+    <p class="lead">这节课讲一个更顺手的知识库管理组合：让 <strong>WorkBuddy 负责流动的 AI 生产</strong>，让 <strong>Obsidian 负责稳定的知识沉淀</strong>，中间用一条简单 workflow 把它们接起来。</p>
+    <div class="arrow-line">把一次性 AI 对话 <span>→</span> 变成可回看的知识系统</div>
+  </div>
+</section>
+
+<section id="s1">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">开场</span> 为什么知识库总是搭不起来</div>
+    <h2>你缺的不是工具，<br>而是中间那座桥</h2>
+    <p class="lead">很多人用 Obsidian 都经历过一个阶段：刚开始很兴奋，建文件夹、设 tag、研究双链，后来发现自己并没有持续用下去。另一边，AI 工具可以帮你写报告、做分析、出计划，但对话关掉之后，很多内容就消失了。</p>
+    <div class="grid3">
+      <div class="card gold">
+        <div class="k">Pain 01</div>
+        <h3>Obsidian 容易变成空库</h3>
+        <p>它很适合沉淀，但启动成本高。你往往还没想清楚知识架构，就已经开始记录了。</p>
+      </div>
+      <div class="card">
+        <div class="k">Pain 02</div>
+        <h3>AI 对话容易一次性</h3>
+        <p>WorkBuddy 很擅长生产内容，但如果只停留在聊天窗口，第二天很难把上下文找回来。</p>
+      </div>
+      <div class="card teal">
+        <div class="k">Pain 03</div>
+        <h3>生产和存储没有接缝</h3>
+        <p>真正卡住人的地方，是 AI 产出的内容如何进入知识库，并且还能被下一次调用。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s2">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">核心判断</span> 一个负责生产，一个负责沉淀</div>
+    <h2>WorkBuddy 是流动的，Obsidian 是沉淀的</h2>
+    <div class="compare">
+      <div class="card">
+        <div class="k">WorkBuddy</div>
+        <h3>擅长生产</h3>
+        <p>用自然语言处理任务，做报告、分析、规划都很流畅。它像一个本地 AI 助手，能读材料、执行任务、反复修改。</p>
+      </div>
+      <div class="vs">+</div>
+      <div class="card teal">
+        <div class="k">Obsidian</div>
+        <h3>擅长存储</h3>
+        <p>它适合做长期知识库：文件夹、双链、标签、模板、索引都能沉淀下来，让内容可回看、可组织、可复用。</p>
+      </div>
+    </div>
+    <div class="bridge">
+      <div class="tag">Bridge</div>
+      <p><b>组合的关键不是“多装一个工具”，而是让 WorkBuddy 读写 Obsidian。</b> 先让 AI 帮你设计 vault 骨架，再把真实 use case 跑进去：输入材料、产出分析、写入笔记、定期回顾。</p>
+    </div>
+  </div>
+</section>
+
+<section id="s3">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">Framework</span> 更轻的知识管理拆法</div>
+    <h2>其实就是一条工作流</h2>
+    <p class="lead">不用把它理解成复杂系统。它只是提醒我们：哪些事情交给 AI，哪些事情必须由人来判断。</p>
+    <div class="simple-stack">
+      <div class="principle">
+        <b>触发</b>
+        <p>先判断什么值得进入知识库，不要什么都收。</p>
+      </div>
+      <div class="principle">
+        <b>输入</b>
+        <p>文章、截图、链接、临时想法，都可以作为原材料。</p>
+      </div>
+      <div class="principle">
+        <b>处理</b>
+        <p>交给 WorkBuddy 做分析、整理、改写和结构化。</p>
+      </div>
+      <div class="principle">
+        <b>沉淀</b>
+        <p>把结果写入 Obsidian，保留文件夹、标签和索引。</p>
+      </div>
+      <div class="principle">
+        <b>回看</b>
+        <p>定期检查旧判断是否还成立，避免知识腐化。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s4">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">Use Case</span> 跑一个真实流程</div>
+    <h2>以“对标账号研究”为例</h2>
+    <p class="lead">不要一上来就搭一个宏大的知识库。先选一个具体场景，把链路跑通一遍：从输入素材，到 AI 分析，再到写入 Obsidian，最后检查哪里断掉。</p>
+    <div class="workflow">
+      <div class="flow-step">
+        <span>01 Input</span>
+        <b>收集材料</b>
+        <p>小红书账号链接、截图、竞品内容、自己的临时判断。</p>
+      </div>
+      <div class="flow-step">
+        <span>02 WorkBuddy</span>
+        <b>产出分析</b>
+        <p>让 AI 做账号定位、内容分类、爆款笔记和可学习点。</p>
+      </div>
+      <div class="flow-step">
+        <span>03 Obsidian</span>
+        <b>写入知识库</b>
+        <p>按模板写入文件夹、补上 tag、双链和索引。</p>
+      </div>
+      <div class="flow-step">
+        <span>04 Review</span>
+        <b>定期回看</b>
+        <p>让 AI 扫描最近写入内容，问一句：这个判断还成立吗？</p>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="k">Start Small</div>
+        <h3>先冻结 vault 骨架</h3>
+        <p>不要边跑边乱建文件夹。先让 WorkBuddy 帮你设计一版 Obsidian vault：哪些内容值得收、怎么命名、标签如何控制复杂度。</p>
+      </div>
+      <div class="card teal">
+        <div class="k">Find Breakpoints</div>
+        <h3>用真实任务测试接缝</h3>
+        <p>跑几个真实 use case，看断点在哪里：输入是否太杂、AI 输出是否能写入、Obsidian 模板是否足够稳定。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="wrap reveal">
+    <div class="eyebrow"><span class="tag">Takeaway</span> 工具之外的边界</div>
+    <div class="takeaway">
+      <div>
+        <p class="quote">Workflow 搭好是手段，<span class="hot">保留理解</span> 才是目的。</p>
+      </div>
+      <div>
+        <p class="lead">AI 可以帮你整理、命名、结构化、写入知识库，但它不能替你决定什么值得进入系统，也不能替你完成“我真的理解了什么”的内化过程。</p>
+      </div>
+    </div>
+    <div class="checklist">
+      <div class="check"><i>①</i><p><b>先定筛选标准：</b>写清楚什么内容值得进入知识库，不要让自动化把所有碎片都塞进去。</p></div>
+      <div class="check"><i>②</i><p><b>再定 vault 骨架：</b>用 WorkBuddy 帮你设计文件夹、标签、模板和索引，先冻结一版再跑流程。</p></div>
+      <div class="check"><i>③</i><p><b>跑真实 use case：</b>从一件具体任务开始，比如对标账号研究，完整跑完输入、分析、写入和回顾。</p></div>
+      <div class="check"><i>④</i><p><b>保留回顾层：</b>定期让 AI 扫描最近笔记，但最终由你判断：这个结论现在还成立吗？</p></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const sections = [...document.querySelectorAll('section')];
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach((entry)=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('in');
+      }
+    });
+  },{threshold:.36});
+  sections.forEach((section)=>io.observe(section));
+  document.querySelectorAll('.reveal').forEach((el)=>io.observe(el));
+
+  const bar = document.getElementById('bar');
+  window.addEventListener('scroll',()=>{
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = `${Math.max(0, Math.min(1, scrollY / max)) * 100}%`;
+  });
+</script>
+</body>
+</html>
